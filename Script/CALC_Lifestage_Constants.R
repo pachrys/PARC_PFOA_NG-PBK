@@ -335,9 +335,9 @@ Variables_df <- Variables_df %>%
   # Exponential decline after age 40
   mutate(
     GFR_M = if_else(age <= 40, Q_GFR_M,
-                       Q_GFRBaseline_M * 0.988^(age - 40)),
+                       Q_GFR_M * 0.988^(age - 40)),
     GFR_F = if_else(age <= 40, Q_GFR_F,
-                       Q_GFRBaseline_F * 0.988^(age - 40))
+                       Q_GFR_F * 0.988^(age - 40))
   )
 
 # write.csv(Variables_df, here("Input", "PhysioVariables.csv"), row.names = FALSE)
