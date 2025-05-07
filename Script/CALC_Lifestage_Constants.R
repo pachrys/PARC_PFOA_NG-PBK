@@ -322,10 +322,10 @@ Variables_df = Variables_df %>%
 Variables_df <- Variables_df %>% 
   # Initial age-dependent changes in GFR
   mutate(
-    Q_GFRi_M = if_else(age < 18, 0.1678 + ((0.70  - 0.1678) / 18) * age,
-                       0.70),
-    Q_GFRi_F = if_else(age < 18, 0.1678 + ((0.90  - 0.1678) / 18) * age,
-                       0.90)) %>% 
+    Q_GFRi_M = if_else(age < 18, 0.1678 + ((0.90  - 0.1678) / 18) * age,
+                       0.90),
+    Q_GFRi_F = if_else(age < 18, 0.1678 + ((0.70  - 0.1678) / 18) * age,
+                       0.70)) %>% 
   # Baseline GFR for males and females (in L/day)
   # (mL/min/1.73m^2 -> L/day)  # scale to actual BSA: SA_B*1e-4 / 1.73
   mutate( 
