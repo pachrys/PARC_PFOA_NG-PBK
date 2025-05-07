@@ -340,8 +340,8 @@ Variables_df <- Variables_df %>%
                        Q_GFRBaseline_F * 0.988^(age - 40))
   ) %>% 
   mutate(
-    GFR_M = Q_GFRc_M*0.6944444444*1.73,
-    GFR_F = Q_GFRc_F*0.6944444444*1.73
+    GFR_M = Q_GFRc_M, #*0.6944444444*1.73,  #(1/1.44)
+    GFR_F = Q_GFRc_F  #*0.6944444444*1.73
   )
 
 write.csv(Variables_df, here("Input", "PhysioVariables.csv"), row.names = FALSE)

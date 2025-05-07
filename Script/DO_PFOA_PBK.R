@@ -58,7 +58,7 @@
     } else {
     
     # Set exposure type, choose between "Oral", "Dermal", "Oral_Dermal" (if exposure is both Oral and Dermal), Inhalation"
-    exposure_type = "Dermal"
+    exposure_type = "Oral"
     
     # Add input information
     
@@ -72,7 +72,7 @@
     expSTOP = 27*365 # time in days after which the exposure stopped
     
     # Subject-relevant information
-    expAGE = 36.1 # years old age at exposure if not provided then age argument is not used physiology is based on BW
+    expAGE = NA # years old age at exposure if not provided then age argument is not used physiology is based on BW
     expBW = NA # kg if not provided then the BW of the corresponding age and sex is taken; if both BW and Age are not given then a default BW = 70 is taken; if BW is higher than the BW from the lifestage equations then the actual BW overwrites the calculated one
     sex = "F" # sex either "F" or "M" if none then default is "M"
     
