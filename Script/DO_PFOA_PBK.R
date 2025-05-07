@@ -26,6 +26,9 @@
   # Choose to include population or individual exposure ("Yes" to include population based and "No" to only run the model for one person)
   Population = "Yes" 
   
+  # Choose between age GFR (TRUE) and renal flow GFR (FALSE)
+  Age_GFR = FALSE 
+  
   # Load files
   Physio.c <- read_csv(here("Input", "PhysioVariables.csv"))
   Tissue.c <- read_csv(here("Input", "TissueComposition.csv"))
@@ -69,11 +72,11 @@
     expCONC = expCONC_Oral + expCONC_Dermal # ug/kg/day concentration
     Tinput = 1 # for repeated exposure or so default = 1
     tinterval = 1 # for repeated exposure or so default = 1
-    expSTOP = 30*365 # time in days after which the exposure stopped
+    expSTOP = 20*365 # time in days after which the exposure stopped
     
     # Subject-relevant information
     expAGE = NA # years old age at exposure if not provided then age argument is not used physiology is based on BW
-    expBW = NA # kg if not provided then the BW of the corresponding age and sex is taken; if both BW and Age are not given then a default BW = 70 is taken; if BW is higher than the BW from the lifestage equations then the actual BW overwrites the calculated one
+    expBW = 70 # kg if not provided then the BW of the corresponding age and sex is taken; if both BW and Age are not given then a default BW = 70 is taken; if BW is higher than the BW from the lifestage equations then the actual BW overwrites the calculated one
     sex = "M" # sex either "F" or "M" if none then default is "M"
     
     # Simulation relevant information
