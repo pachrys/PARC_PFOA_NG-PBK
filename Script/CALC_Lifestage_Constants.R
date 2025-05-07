@@ -330,7 +330,7 @@ Variables_df <- Variables_df %>%
   # (mL/min/1.73m^2 -> L/day)  # scale to actual BSA: SA_B*1e-4 / 1.73
   mutate( 
     Q_GFRBaseline_M = (107.3 * 1.44*(BSA_M)/1.73) / (0.9/Q_GFRi_M),
-    Q_GFRBaseline_F = (107.3 * 1.44*(BSA_M)/1.73) / (0.9/Q_GFRi_F)
+    Q_GFRBaseline_F = (107.3 * 1.44*(BSA_F)/1.73) / (0.7/Q_GFRi_F)
   ) %>% 
   # Exponential decline after age 40
   mutate(

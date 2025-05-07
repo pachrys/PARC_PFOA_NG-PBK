@@ -44,7 +44,7 @@ ORAL_PBK_RUN <- function(y, parms, times){ # Input for ode
       QR <- QC - (QA + QI + QK + QL)  # L/d, Rest
       
       QUr <- QUrc * BW              # L/d, Urine flow rate to the bladder 22 mL/kg BW/d [ICRP 89 page 161]
-      GFR <- GFRc * QK              # L/d 18% of total renal plasma flow [ICRP 89 page 159] http://www.icrp.org/publication.asp?id=ICRP%20Publication%2089
+      # GFR <- GFRc * QK              # L/d 18% of total renal plasma flow [ICRP 89 page 159] http://www.icrp.org/publication.asp?id=ICRP%20Publication%2089
       QT <- QT                      # L/d, Proximal tubule fluid flow
       
       tco <- tco                    # /d, Bowel residence times in the colon
@@ -274,8 +274,7 @@ DERMAL_PBK_RUN <- function(y, parms, times){ # Input for ode
       QR <- QC - (QA + QI + QK + QL + QSk)  # L/d, Rest
       
       QUr <- QUrc * BW              # L/d, Urine flow rate to the bladder 22 mL/kg BW/d [ICRP 89 page 161]
-      GFR <- GFRc * QK              # L/d 18% of total renal plasma flow [ICRP 89 page 159] http://www.icrp.org/publication.asp?id=ICRP%20Publication%2089
-      # GFR <- GFR
+      # GFR <- GFRc * QK              # L/d 18% of total renal plasma flow [ICRP 89 page 159] http://www.icrp.org/publication.asp?id=ICRP%20Publication%2089
       QT <- QT                      # L/d, Proximal tubule fluid flow
       
       tco <- tco                    # /d, Bowel residence times in the colon
@@ -525,8 +524,7 @@ ORAL_DERMAL_PBK_RUN <- function(y, parms, times){ # Input for ode
       QR <- QC - (QA + QI + QK + QL + QSk)  # L/d, Rest
       
       QUr <- QUrc * BW              # L/d, Urine flow rate to the bladder 22 mL/kg BW/d [ICRP 89 page 161]
-      GFR <- GFRc * QK              # L/d 18% of total renal plasma flow [ICRP 89 page 159] http://www.icrp.org/publication.asp?id=ICRP%20Publication%2089
-      # GFR <- GFR
+      # GFR <- GFRc * QK              # L/d 18% of total renal plasma flow [ICRP 89 page 159] http://www.icrp.org/publication.asp?id=ICRP%20Publication%2089
       QT <- QT                      # L/d, Proximal tubule fluid flow
       
       tco <- tco                    # /d, Bowel residence times in the colon
@@ -782,8 +780,7 @@ INHALATION_PBK_RUN <- function(y, parms, times){ # Input for ode
       QR <- QC - (QA + QI + QK + QL)        # L/d, Rest
       
       QUr <- QUrc * BW              # L/d, Urine flow rate to the bladder 22 mL/kg BW/d [ICRP 89 page 161]
-      GFR <- GFRc * QK              # L/d 18% of total renal plasma flow [ICRP 89 page 159] http://www.icrp.org/publication.asp?id=ICRP%20Publication%2089
-      # GFR <- GFR
+      # GFR <- GFRc * QK              # L/d 18% of total renal plasma flow [ICRP 89 page 159] http://www.icrp.org/publication.asp?id=ICRP%20Publication%2089
       QT <- QT                      # L/d, Proximal tubule fluid flow
       
       tco <- tco                    # /d, Bowel residence times in the colon
