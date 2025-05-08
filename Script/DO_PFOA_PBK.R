@@ -37,23 +37,18 @@
   # Load input ----
   if(Population == "Yes"){
     
-    RawData <- read_csv(here("Input", "OlsenData.csv")) 
+    RawData <- read_csv(here("Input", "INPUT_dummy.csv")) 
     
-    if(Lifestage == "Yes" && any(is.na(RawData$expAGE))){
-      
-      warning("Removing ", sum(is.na(RawData$expAGE)), " samples as they had NA(s) as expAGE; exposure AGE is needed to run the lifestage model")
-      Input <- filter (RawData, !is.na(expAGE))
-      Input <- Input %>% filter(Idcode %in% 1:26)
-    
-    } else if (Lifestage == "Yes") {
-      # Lifestage = Yes, No missing expAGE values
-      Input <- RawData %>%
-        filter(Idcode %in% 1:26)
-      
+    if (Lifestage == "Yes") {
+      if (any(is.na(RawData$expAGE))) {
+        warning("Removing ", sum(is.na(RawData$expAGE)), " samples with missing expAGE")
+        Input <- RawData %>% filter(!is.na(expAGE))
+      } else {
+        Input <- RawData
+      }
     } else {
-      # Lifestage = No
-      Input <- RawData %>%
-        filter(Idcode %in% 1:26)
+      RawData$expAGE <- 30 # Lifestage = "No" -> assign default expAGE
+      Input <- RawData
     }
     
     nPeople <- as.numeric(nrow(Input)) # number of people
@@ -69,7 +64,7 @@
     # Set exposure type, choose between "Oral", "Dermal", "Oral_Dermal" (if exposure is both Oral and Dermal), Inhalation"
     exposure_type = "Oral"
     
-    # Add input information
+    # Add single individual input information
     
     # Exposure-relevant information
     exposure_type = exposure_type # type of exposure
@@ -108,8 +103,7 @@
       
     }
     
-  }
-
+    }
   
   # Run model ----
   
