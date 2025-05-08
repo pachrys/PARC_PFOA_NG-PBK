@@ -34,19 +34,21 @@
   Tissue.c <- read_csv(here("Input", "TissueComposition.csv"))
   source(here("Script", "RUN_and_OUTPUT.R"))
   
-  OlsenData <- read_csv(here("Input", "OlsenData.csv"))
+  # OlsenData <- read.csv(here("Input", "OlsenData.csv"))
+  # Input <- filter (OlsenData, !is.na(expAGE))
+  # Input <- OlsenData %>% filter(Idcode %in% 1:26)
   
   # Load input ----
   
   if(Population == "Yes"){
     
-    INPUT_dummy <- read.csv(here("Input", "INPUT_dummy.csv")) 
+    OlsenData <- read.csv(here("Input", "OlsenData.csv")) 
     
-    if(Lifestage == "Yes" && any(is.na(INPUT_dummy$expAGE))){
+    if(Lifestage == "Yes" && any(is.na(OlsenData$expAGE))){
       
-      warning("Removing ", sum(is.na(INPUT_dummy$expAGE)), " samples as they had NA(s) as expAGE; exposure AGE is needed to run the lifestage model")
-      Input <- filter (INPUT_dummy, !is.na(expAGE))
-      Input <- Input %>% filter(Idcode %in% 27:36)
+      warning("Removing ", sum(is.na(OlsenData$expAGE)), " samples as they had NA(s) as expAGE; exposure AGE is needed to run the lifestage model")
+      Input <- filter (OlsenData, !is.na(expAGE))
+      Input <- Input %>% filter(Idcode %in% 1:26)
     } 
     
     nPeople <- as.numeric(nrow(Input)) # number of people
@@ -57,11 +59,10 @@
       OUT_Plots = vector("list", nPeople) # could be removed if it's too heavy for R
     )
     
-    
     } else {
     
     # Set exposure type, choose between "Oral", "Dermal", "Oral_Dermal" (if exposure is both Oral and Dermal), Inhalation"
-    exposure_type = "Oral"
+    exposure_type = "Dermal"
     
     # Add input information
     
