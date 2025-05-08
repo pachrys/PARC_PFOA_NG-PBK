@@ -76,9 +76,9 @@
     expSTOP = 20*365 # time in days after which the exposure stopped
     
     # Subject-relevant information
-    expAGE = NA # years old age at exposure if not provided then age argument is not used physiology is based on BW
-    expBW = 70 # kg if not provided then the BW of the corresponding age and sex is taken; if both BW and Age are not given then a default BW = 70 is taken; if BW is higher than the BW from the lifestage equations then the actual BW overwrites the calculated one
-    sex = "M" # sex either "F" or "M" if none then default is "M"
+    expAGE = 30 # years old age at exposure if not provided then age argument is not used physiology is based on BW
+    expBW = NA # kg if not provided then the BW of the corresponding age and sex is taken; if both BW and Age are not given then a default BW = 70 is taken; if BW is higher than the BW from the lifestage equations then the actual BW overwrites the calculated one
+    sex = "F" # sex either "F" or "M" if none then default is "M"
     
     # Simulation relevant information
     Tstart = 0 # days start of the simulation
