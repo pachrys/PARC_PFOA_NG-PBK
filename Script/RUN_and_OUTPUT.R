@@ -272,7 +272,7 @@ RUNandOUT <- function(exposure_type,
   
   
   # Calculate AUC
-  print(paste("Subject ID:",Input$Idcode[i]))
+  print(paste("ID:",Input$Idcode[i]))
   AUC <- trapz(PBK_OUTPUT[ , "time"], PBK_OUTPUT[ , "CP"])  # ug*day/L
   print(AUC)
   
@@ -682,7 +682,7 @@ RUNandOUT_lifestage <- function(exposure_type,
   
   
   # Calculate AUC
-  print(paste("Subject ID:",Input$Idcode[i]))
+  print(paste("ID:",Input$Idcode[i]))
   AUC <- trapz(PBK_OUTPUT[ , "time"], PBK_OUTPUT[ , "CP"])  # ug*day/L
   print(AUC)
   
