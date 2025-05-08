@@ -355,7 +355,7 @@ DERMAL_PARAMS <- function(expAGE = NULL, expBW = NULL, sex = "M", base.parm.c) {
   
   if (!is.na(expAGE)) { # filters based on Age
     Physio_params <- Physio_params %>% 
-      mutate(age_diff = abs(age - c(expAGE))) %>%  
+      mutate(age_diff = abs(age - as.vector(expAGE))) %>%  
       filter(age_diff == min(age_diff)) %>% 
       slice(1)
   } else if (!is.na(expBW)) { # filters based on BW if Age is not provided

@@ -27,37 +27,32 @@
   Population = "Yes" 
   
   # Choose between age GFR (TRUE) and renal flow GFR (FALSE)
-  Age_GFR = FALSE 
+  Age_GFR = FALSE
   
   # Load files
   Physio.c <- read_csv(here("Input", "PhysioVariables.csv"))
   Tissue.c <- read_csv(here("Input", "TissueComposition.csv"))
   source(here("Script", "RUN_and_OUTPUT.R"))
-  
-  # OlsenData <- read.csv(here("Input", "OlsenData.csv"))
-  # Input <- filter (OlsenData, !is.na(expAGE))
-  # Input <- OlsenData %>% filter(Idcode %in% 1:26)
-  
+
   # Load input ----
-  
   if(Population == "Yes"){
     
-    OlsenData <- read_csv(here("Input", "OlsenData.csv")) 
+    RawData <- read_csv(here("Input", "OlsenData.csv")) 
     
-    if(Lifestage == "Yes" && any(is.na(OlsenData$expAGE))){
+    if(Lifestage == "Yes" && any(is.na(RawData$expAGE))){
       
-      warning("Removing ", sum(is.na(OlsenData$expAGE)), " samples as they had NA(s) as expAGE; exposure AGE is needed to run the lifestage model")
-      Input <- filter (OlsenData, !is.na(expAGE))
+      warning("Removing ", sum(is.na(RawData$expAGE)), " samples as they had NA(s) as expAGE; exposure AGE is needed to run the lifestage model")
+      Input <- filter (RawData, !is.na(expAGE))
       Input <- Input %>% filter(Idcode %in% 1:26)
     
     } else if (Lifestage == "Yes") {
       # Lifestage = Yes, No missing expAGE values
-      Input <- OlsenData %>%
+      Input <- RawData %>%
         filter(Idcode %in% 1:26)
       
     } else {
       # Lifestage = No
-      Input <- OlsenData %>%
+      Input <- RawData %>%
         filter(Idcode %in% 1:26)
     }
     
