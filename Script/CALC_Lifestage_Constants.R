@@ -313,13 +313,10 @@ Variables_df = Variables_df %>%
   
   # Adipose tissue
   mutate(Q_adiposeFraction_M = (V_adiposeFraction_M/0.20)*0.052) %>% # sc_F[0-17] = (sc_V[i]  / sc_V_adult[i])  * sc_F_adult[i];
-  mutate(Q_adiposeFraction_F = (V_adiposeFraction_F/0.3167)*0.087) # sc_F[0-17] = (sc_V[i]  / sc_V_adult[i])  * sc_F_adult[i];
-# write.csv(Variables_df, "PhysioVariables.csv", row.names = FALSE)
+  mutate(Q_adiposeFraction_F = (V_adiposeFraction_F/0.3167)*0.087) %>% # sc_F[0-17] = (sc_V[i]  / sc_V_adult[i])  * sc_F_adult[i];
 
-
-## Glomerular Filtration Rate (L/day) :
-## # Baseline neonatal GFR should be 20.0 mL/min: Qi = (20*0.9)/107.3 = 0.1678 mg/dL (Smeets 2022, https://doi.org/10.1681/ASN.2021101326)
-Variables_df <- Variables_df %>%
+  # Glomerular Filtration Rate (L/day)
+  
   # Initial age-dependent changes in GFR
   mutate(
     Q_GFRi_M = if_else(age < 18, 0.1678 + ((0.90  - 0.1678) / 18) * age,
@@ -327,10 +324,10 @@ Variables_df <- Variables_df %>%
     Q_GFRi_F = if_else(age < 18, 0.1678 + ((0.70  - 0.1678) / 18) * age,
                        0.70)) %>%
   # Baseline GFR for males and females (in L/day)
-  # (mL/min/1.73m^2 -> L/day)  # scale to actual BSA: SA_B*1e-4 / 1.73
+  # (mL/min/1.73m^2 -> L/day)  # scale to actual BSA:SA_B*1e-4 / 1.73
   mutate(
-    Q_GFR_M = (107.3 * 1.44*(BSA_M)/1.73) / (0.9/Q_GFRi_M),
-    Q_GFR_F = (107.3 * 1.44*(BSA_F)/1.73) / (0.7/Q_GFRi_F)
+    Q_GFR_M = (107.3 * 1.44 * (BSA_M) / 1.73) / (0.9/Q_GFRi_M),
+    Q_GFR_F = (107.3 * 1.44 * (BSA_F) / 1.73) / (0.7/Q_GFRi_F)
   ) %>%
   # Exponential decline after age 40
   mutate(
@@ -340,8 +337,7 @@ Variables_df <- Variables_df %>%
                        Q_GFR_F * 0.988^(age - 40))
   )
 
-# write.csv(Variables_df, here("Input", "PhysioVariables.csv"), row.names = FALSE)
-write.csv(Variables_df, "PhysioVariables.csv", row.names = FALSE)
+  write.csv(Variables_df, here("Input", "PhysioVariables.csv"), row.names = FALSE)
 
 
 # ## Check mass balance volumes and flows ####

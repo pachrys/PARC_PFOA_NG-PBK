@@ -27,7 +27,7 @@
   Population = "Yes" 
   
   # Choose between age GFR (TRUE) and renal flow GFR (FALSE)
-  Age_GFR = FALSE
+  Age_GFR = TRUE
   
   # Load files
   Physio.c <- read_csv(here("Input", "PhysioVariables.csv"))
