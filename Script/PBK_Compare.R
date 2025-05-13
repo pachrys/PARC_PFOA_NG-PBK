@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------------- #
-# SCRIPT FOR COMPARING PBK MODEL RESULTS BY PARAMETER
+# SCRIPT FOR COMPARING PBK MODEL RESULTS AND PARAMETERS 
 # By: Jack Koster
 # Date: 08-05-2025
 # --------------------------------------------------------------------------- #
@@ -11,6 +11,7 @@ library(ggplot2)
 library(here)
 library(readr)
 library(showtext)
+library(Metrics)
 
 # Set output storage directory
 OUTPUT <- here("Output", format(Sys.Date(), "%Y-%m-%d"), format(Sys.time(), "%H-%M-%S"))
@@ -18,7 +19,7 @@ dir.create(OUTPUT, recursive = TRUE)
 
 # Load results and rename
 
-# Extract AUC and HalfLife #### 
+# Extract AUC and HalfLives #### 
 extract_data <- function(dataset, dataset_name) {
   result_data <- data.frame(
     Individual = integer(),
@@ -65,7 +66,7 @@ age_lt_data <- extract_data(RESULTS_Age_LT, "RESULTS_Age_LT")
 # Plots ####
 ## plot AUC #### 
 p_AUC <- ggplot(final_results, aes(x = Individual, y = AUC, color = Condition)) +
-  geom_point(size = 4) +  # Larger dots
+  geom_point(size = 4) + 
   labs(title = "AUC by Condition",
        x = "Individual",
        y = "AUC") +
@@ -83,7 +84,7 @@ p_AUC <- ggplot(final_results, aes(x = Individual, y = AUC, color = Condition)) 
   
 ## plot HalfLife ####
 p_HalfLife <- ggplot(final_results, aes(x = Individual, y = HalfLife, color = Condition)) +
-  geom_point(size = 4) +  # Larger dots
+  geom_point(size = 4) + 
   labs(title = "HalfLife by Condition",
        x = "Individual",
        y = "HalfLife (days)") +
@@ -102,7 +103,7 @@ p_HalfLife <- ggplot(final_results, aes(x = Individual, y = HalfLife, color = Co
 ## GFR Comparison Plots ####
 
   # Load calculated GFR values and convert (L/d -> mL/min)
-  GFR_pop <- read_csv("Input/GFRdata.csv") %>% #Population data set 
+  GFR_pop <- read_csv("Input/GFRdata.csv") #Population data set 
   GFR_df <- read_csv("Input/PhysioVariables.csv") %>%
     select(age, GFR_M, GFR_F, GFR_M_flow, GFR_F_flow) %>%
     mutate(across(-age, ~ .x / 1.44))
@@ -115,12 +116,11 @@ p_HalfLife <- ggplot(final_results, aes(x = Individual, y = HalfLife, color = Co
                              "GFR_M" = "Male Age GFR",
                              "GFR_F" = "Female Age GFR"
     ))
-  
 
   p_GFR <- ggplot() +
-    geom_line(data = GFR_df_long, aes(x = age, y = Value, color = Variable), size = 1.2) +
-    geom_point(data = GFR_pop, aes(x = age, y = GFR), color = "aquamarine", size = 2.5, alpha = 0.8) +
-    theme_minimal(base_size = 18) +
+    geom_line(data = GFR_df_long, aes(x = age, y = Value, color = Variable), linewidth = 1.2) +
+    geom_point(data = GFR_pop, aes(x = age, y = GFR), color = "aquamarine", size = 1, alpha = 0.8) +
+    theme_minimal(base_size = 20) +
     labs(
       title = "Calculated and Measured GFR across Lifespan",
       x = "Age (years)",
@@ -135,4 +135,22 @@ p_HalfLife <- ggplot(final_results, aes(x = Individual, y = HalfLife, color = Co
       plot.title = element_text(size = 20, face = "bold", hjust = 0.5)
     )
   
-  ggsave(file.path(OUTPUT, "GFR_Compare_plot.png"), plot = p_GFR, width = 8, height = 6)
+  ggsave(file.path(OUTPUT, "GFR_pop_plot.png"), plot = p_GFR, width = 8, height = 6)
+  
+  
+## GFR model fit ####
+  
+  GFR_line <- GFR_df_long %>%     # Nest model data by Variable
+    group_by(Variable) %>%
+    nest()
+  
+  GFR_fit <- GFR_line %>%         # Interpolate each line to get predicted GFRs at measured ages
+    mutate(
+      predictions = map(data, ~ approx(x = .x$age, y = .x$Value, xout = GFR_pop$age)$y),
+      rmse = map_dbl(predictions, ~ rmse(GFR_pop$GFR, .x)),
+      mae = map_dbl(predictions, ~ mae(GFR_pop$GFR, .x))
+    ) %>%
+    select(Variable, rmse, mae)
+  
+  print(GFR_fit)
+  
