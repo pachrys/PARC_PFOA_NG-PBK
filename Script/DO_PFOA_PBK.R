@@ -26,8 +26,8 @@
   # Choose to include population or individual exposure ("Yes" to include population based and "No" to only run the model for one person)
   Population = "Yes" 
   
-  # Choose between age GFR (TRUE) and renal flow GFR (FALSE)
-  Age_GFR = TRUE
+  # Choose between age GFR (TRUE) or renal plasma flow GFR (FALSE)
+  Age_GFR = FALSE
   
   # Load files
   Physio.c <- read_csv(here("Input", "PhysioVariables.csv"))
@@ -62,7 +62,7 @@
     } else {
     
     # Set exposure type, choose between "Oral", "Dermal", "Oral_Dermal" (if exposure is both Oral and Dermal), Inhalation"
-    exposure_type = "Oral"
+    exposure_type = "Oral_Dermal"
     
     # Add single individual input information
     

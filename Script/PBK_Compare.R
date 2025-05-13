@@ -5,13 +5,16 @@
 # --------------------------------------------------------------------------- #
 
 # Packages
+library(tidyverse)
 library(writexl)
 library(ggplot2)
 library(here)
+library(readr)
+library(showtext)
 
-# # Set output storage directory
-# OUTPUT <- here("Output", format(Sys.Date(), "%Y-%m-%d"), format(Sys.time(), "%H-%M-%S"))
-# dir.create(OUTPUT, recursive = TRUE)
+# Set output storage directory
+OUTPUT <- here("Output", format(Sys.Date(), "%Y-%m-%d"), format(Sys.time(), "%H-%M-%S"))
+dir.create(OUTPUT, recursive = TRUE)
 
 # Load results and rename
 
@@ -60,7 +63,7 @@ age_lt_data <- extract_data(RESULTS_Age_LT, "RESULTS_Age_LT")
 
   
 # Plots ####
-# plot AUC 
+## plot AUC #### 
 p_AUC <- ggplot(final_results, aes(x = Individual, y = AUC, color = Condition)) +
   geom_point(size = 4) +  # Larger dots
   labs(title = "AUC by Condition",
@@ -74,8 +77,11 @@ p_AUC <- ggplot(final_results, aes(x = Individual, y = AUC, color = Condition)) 
     axis.title = element_text(size = 14),   
     axis.text = element_text(size = 12)      
   )
+  
+  ggsave(file.path(OUTPUT, "AUC_plot.png"), plot = p_AUC, width = 8, height = 6)
 
-# plot HalfLife
+  
+## plot HalfLife ####
 p_HalfLife <- ggplot(final_results, aes(x = Individual, y = HalfLife, color = Condition)) +
   geom_point(size = 4) +  # Larger dots
   labs(title = "HalfLife by Condition",
@@ -90,5 +96,43 @@ p_HalfLife <- ggplot(final_results, aes(x = Individual, y = HalfLife, color = Co
     axis.text = element_text(size = 12)      
   )
 
-ggsave(file.path(OUTPUT, "AUC_plot.png"), plot = p_AUC, width = 8, height = 6)
-ggsave(file.path(OUTPUT, "HalfLife_plot.png"), plot = p_HalfLife, width = 8, height = 6)
+  ggsave(file.path(OUTPUT, "HalfLife_plot.png"), plot = p_HalfLife, width = 8, height = 6)
+
+
+## GFR Comparison Plots ####
+
+  # Load calculated GFR values and convert (L/d -> mL/min)
+  GFR_pop <- read_csv("Input/GFRdata.csv") %>% #Population data set 
+  GFR_df <- read_csv("Input/PhysioVariables.csv") %>%
+    select(age, GFR_M, GFR_F, GFR_M_flow, GFR_F_flow) %>%
+    mutate(across(-age, ~ .x / 1.44))
+  
+  GFR_df_long <- GFR_df %>%
+    pivot_longer(cols = -age, names_to = "Variable", values_to = "Value") %>%
+    mutate(Variable = recode(Variable,
+                             "GFR_M_flow" = "Male Flow GFR",
+                             "GFR_F_flow" = "Female Flow GFR",
+                             "GFR_M" = "Male Age GFR",
+                             "GFR_F" = "Female Age GFR"
+    ))
+  
+
+  p_GFR <- ggplot() +
+    geom_line(data = GFR_df_long, aes(x = age, y = Value, color = Variable), size = 1.2) +
+    geom_point(data = GFR_pop, aes(x = age, y = GFR), color = "aquamarine", size = 2.5, alpha = 0.8) +
+    theme_minimal(base_size = 18) +
+    labs(
+      title = "Calculated and Measured GFR across Lifespan",
+      x = "Age (years)",
+      y = "GFR (mL/min)",
+      color = "Variable"
+    ) +
+    theme(
+      legend.title = element_text(size = 18),
+      legend.text = element_text(size = 16),
+      axis.title = element_text(size = 18),
+      axis.text = element_text(size = 16),
+      plot.title = element_text(size = 20, face = "bold", hjust = 0.5)
+    )
+  
+  ggsave(file.path(OUTPUT, "GFR_Compare_plot.png"), plot = p_GFR, width = 8, height = 6)

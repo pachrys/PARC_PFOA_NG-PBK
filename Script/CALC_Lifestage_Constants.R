@@ -63,7 +63,7 @@ mutate(BW_M=3.382e+00+
   
 # Body Surface Area (m2), reference: Gastellu et al. 2024, 10.1016/j.envres.2024.120393 (supplementary file Physio_equations_detailed.xlsx, eq. from Pendse et al. 2020)
   mutate(BSA_M = exp(-3.75 + 0.42*log(BH_M)+0.52*log(BW_M)),
-         BSA_F =  exp(-3.75 + 0.42*log(BH_F)+0.52*log(BW_F)))  
+         BSA_F = exp(-3.75 + 0.42*log(BH_F)+0.52*log(BW_F)))  
 
 
   
@@ -83,7 +83,7 @@ a1_M = Param4_M - 6*b1_M
 b2_M = (Param5_M - Param4_M)/5
 a2_M = Param4_M - 15*b2_M
 
-# Hematocrit - non pragnant female
+# Hematocrit - non pregnant female
 Param1_F = 32.617402
 Param2_F = 53.188459
 Param3_F = 7.699418
@@ -95,7 +95,8 @@ a1_F = Param4_F - 3*b1_F
 b2_F = (Param5_F - Param4_F)/7
 a2_F = Param5_F - 10*b2_F
 
-
+GFRc = 0.18
+QTotc = 0.988
 
 ## Fractional Volumes ####
 
@@ -316,6 +317,10 @@ Variables_df = Variables_df %>%
   mutate(Q_adiposeFraction_F = (V_adiposeFraction_F/0.3167)*0.087) %>% # sc_F[0-17] = (sc_V[i]  / sc_V_adult[i])  * sc_F_adult[i];
 
   # Glomerular Filtration Rate (L/day)
+  mutate(
+    GFR_M_flow = GFRc * (Q_kidneyFraction_M / QTotc * CardOut_M),
+    GFR_F_flow = GFRc * (Q_kidneyFraction_F / QTotc * CardOut_F)) %>%
+  
   
   # Initial age-dependent changes in GFR
   mutate(
