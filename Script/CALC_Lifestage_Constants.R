@@ -316,19 +316,17 @@ Variables_df = Variables_df %>%
   mutate(Q_adiposeFraction_M = (V_adiposeFraction_M/0.20)*0.052) %>% # sc_F[0-17] = (sc_V[i]  / sc_V_adult[i])  * sc_F_adult[i];
   mutate(Q_adiposeFraction_F = (V_adiposeFraction_F/0.3167)*0.087) %>% # sc_F[0-17] = (sc_V[i]  / sc_V_adult[i])  * sc_F_adult[i];
 
-  # Glomerular Filtration Rate (L/day)
-  mutate(
-    GFR_M_flow = GFRc * (Q_kidneyFraction_M / QTotc * CardOut_M),
-    GFR_F_flow = GFRc * (Q_kidneyFraction_F / QTotc * CardOut_F)) %>%
+  # GFR (renal plasma flow dependent) 
+  mutate(GFR_M_flow = GFRc * (Q_kidneyFraction_M / QTotc * CardOut_M)) %>%
+  mutate(GFR_F_flow = GFRc * (Q_kidneyFraction_F / QTotc * CardOut_F)) %>%
   
-  
-  # Initial age-dependent changes in GFR
+  # GFR (age-dependent) 
   mutate(
     Q_GFRi_M = if_else(age < 18, 0.1678 + ((0.90  - 0.1678) / 18) * age,
                        0.90),
     Q_GFRi_F = if_else(age < 18, 0.1678 + ((0.70  - 0.1678) / 18) * age,
                        0.70)) %>%
-  # Baseline GFR for males and females (in L/day)
+  # Baseline GFR for males and females
   # (mL/min/1.73m^2 -> L/day)  # scale to actual BSA:SA_B*1e-4 / 1.73
   mutate(
     Q_GFR_M = (107.3 * 1.44 * (BSA_M) / 1.73) / (0.9/Q_GFRi_M),

@@ -151,8 +151,6 @@
         Pop.RESULTS$ANALYSED_data[[i]] <- Pop.MODEL_OUTPUT$ANALYSED_data
         Pop.RESULTS$OUT_Plots[[i]] <- Pop.MODEL_OUTPUT$OUT_Plots # could be removed if it's too heavy for R
         
-        
-        
       }
       
     } else { # Population but no lifestage

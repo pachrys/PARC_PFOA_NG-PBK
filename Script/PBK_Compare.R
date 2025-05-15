@@ -11,11 +11,11 @@ library(ggplot2)
 library(here)
 library(readr)
 library(showtext)
-library(Metrics)
+library(metrics)
 
-# Set output storage directory
-OUTPUT <- here("Output", format(Sys.Date(), "%Y-%m-%d"), format(Sys.time(), "%H-%M-%S"))
-dir.create(OUTPUT, recursive = TRUE)
+# # Set output storage directory
+# OUTPUT <- here("Output", format(Sys.Date(), "%Y-%m-%d"), format(Sys.time(), "%H-%M-%S"))
+# dir.create(OUTPUT, recursive = TRUE)
 
 # Load results and rename
 
@@ -67,8 +67,7 @@ age_lt_data <- extract_data(RESULTS_Age_LT, "RESULTS_Age_LT")
 ## plot AUC #### 
 p_AUC <- ggplot(final_results, aes(x = Individual, y = AUC, color = Condition)) +
   geom_point(size = 4) + 
-  labs(title = "AUC by Condition",
-       x = "Individual",
+  labs(x = "Individual",
        y = "AUC") +
   theme_minimal() +
   theme(
@@ -85,9 +84,8 @@ p_AUC <- ggplot(final_results, aes(x = Individual, y = AUC, color = Condition)) 
 ## plot HalfLife ####
 p_HalfLife <- ggplot(final_results, aes(x = Individual, y = HalfLife, color = Condition)) +
   geom_point(size = 4) + 
-  labs(title = "HalfLife by Condition",
-       x = "Individual",
-       y = "HalfLife (days)") +
+  labs(x = "Individual",
+       y = "HalfLife (years)") +
   theme_minimal() +
   theme(
     legend.title = element_text(size = 14),  
@@ -102,11 +100,11 @@ p_HalfLife <- ggplot(final_results, aes(x = Individual, y = HalfLife, color = Co
 
 ## GFR Comparison Plots ####
 
-  # Load calculated GFR values and convert (L/d -> mL/min)
-  GFR_pop <- read_csv("Input/GFRdata.csv") #Population data set 
+  # Load calculated GFR values and convert 
+  GFR_pop <- read_csv("Input/GFRdata.csv")    #Population data set 
   GFR_df <- read_csv("Input/PhysioVariables.csv") %>%
     select(age, GFR_M, GFR_F, GFR_M_flow, GFR_F_flow) %>%
-    mutate(across(-age, ~ .x / 1.44))
+    mutate(across(-age, ~ .x / 1.44))   #(L/d -> mL/min)
   
   GFR_df_long <- GFR_df %>%
     pivot_longer(cols = -age, names_to = "Variable", values_to = "Value") %>%
@@ -122,7 +120,6 @@ p_HalfLife <- ggplot(final_results, aes(x = Individual, y = HalfLife, color = Co
     geom_point(data = GFR_pop, aes(x = age, y = GFR), color = "aquamarine", size = 1, alpha = 0.8) +
     theme_minimal(base_size = 20) +
     labs(
-      title = "Calculated and Measured GFR across Lifespan",
       x = "Age (years)",
       y = "GFR (mL/min)",
       color = "Variable"
