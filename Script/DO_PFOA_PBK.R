@@ -26,8 +26,8 @@
   # Choose to include population or individual exposure ("Yes" to include population based and "No" to only run the model for one person)
   Population = "Yes" 
   
-  # Choose between age GFR (TRUE) or renal plasma flow GFR (FALSE)
-  Age_GFR = FALSE
+  # Choose between age GFR ("Age") or renal plasma flow GFR ("Flow")
+  GFR_type = "Flow"
   
   # Load files
   Physio.c <- read_csv(here("Input", "PhysioVariables.csv"))

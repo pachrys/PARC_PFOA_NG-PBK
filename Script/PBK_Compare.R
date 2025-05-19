@@ -134,10 +134,10 @@ p_HalfLife <- ggplot(final_results, aes(x = Individual, y = HalfLife, color = Co
   
   ggsave(file.path(OUTPUT, "GFR_pop_plot.png"), plot = p_GFR, width = 8, height = 6)
   
-  
+
 ## GFR model fit ####
   
-  GFR_line <- GFR_df_long %>%     # Nest model data by Variable
+  GFR_line <- GFR_df_long %>% 
     group_by(Variable) %>%
     nest()
   
