@@ -20,6 +20,9 @@
   OUTPUT <- here("Output", format(Sys.Date(), "%Y-%m-%d"), format(Sys.time(), "%H-%M-%S"))
   dir.create(OUTPUT, recursive = TRUE)
   
+  
+  # Options ----
+  
   # Choose if physiology should change with age ("Yes" to include physiological changes due to age and "No" to assume the same physiology over time)
   Lifestage = "Yes" 
   
@@ -28,6 +31,10 @@
   
   # Choose between age GFR ("Age") or renal plasma flow GFR ("Flow")
   GFR_type = "Flow"
+  
+  # Choose ID Range (a:b)
+  ID_range = 1:3
+  
   
   # Load files
   Physio.c <- read_csv(here("Input", "PhysioVariables.csv"))
@@ -38,20 +45,21 @@
   if(Population == "Yes"){
     
     RawData <- read_csv(here("Input", "INPUT_EuroMix.csv")) 
-    Input <- RawData %>% filter(Idcode %in% 1:3) # ID Select
+    Input <- RawData %>% filter(Idcode %in% ID_range) # ID range
     
     if (Lifestage == "Yes") {
       if (any(is.na(RawData$expAGE))) {
         warning("Removing ", sum(is.na(RawData$expAGE)), " samples with missing expAGE")
         RawData <- filter(!is.na(expAGE))
-        Input <- RawData %>% filter(Idcode %in% 1:3) # ID Select
+        Input <- RawData %>% filter(Idcode %in% ID_range) 
         
       } else {
-        Input <- RawData
+        Input <- RawData %>% filter(Idcode %in% ID_range) 
+        
       }
     } else {
       RawData$expAGE = 30 # Lifestage = "No" -> assign default expAGE
-      Input <- RawData
+      Input <- RawData %>% filter(Idcode %in% ID_range) 
     }
     
     nPeople <- as.numeric(nrow(Input)) # number of people

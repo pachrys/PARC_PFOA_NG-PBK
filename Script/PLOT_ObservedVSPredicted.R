@@ -24,9 +24,9 @@ dir.create(OUTPUT, recursive = TRUE)
 # Should be used together with the INPUT_dummy.csv file and simulation results after running it
 
 ObsHalfLifes <- read_csv(here("Input", "HalfLifes.csv"))
-Oral.F <- RESULTS$ANALYSED_data[[4]]$HalfLife
-Oral.M <- RESULTS$ANALYSED_data[[5]]$HalfLife
-Dermal.F <- RESULTS$ANALYSED_data[[6]]$HalfLife
+Oral.F <- RESULTS$ANALYSED_data[[1]]$HalfLife
+Oral.M <- RESULTS$ANALYSED_data[[3]]$HalfLife
+Dermal.F <- RESULTS$ANALYSED_data[[2]]$HalfLife
 Inhalation.F <- RESULTS$ANALYSED_data[[2]]$HalfLife
 
 # Prepare observed data
