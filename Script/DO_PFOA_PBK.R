@@ -3,7 +3,7 @@
 # By: Chrysanthi Pachoulide
 # Date: 14-04-2025
 # --------------------------------------------------------------------------- #
-  
+
   rm(list=ls()) 
   
   # Packages
@@ -37,7 +37,7 @@
   # Load input ----
   if(Population == "Yes"){
     
-    RawData <- read_csv(here("Input", "INPUT_dummy.csv")) 
+    RawData <- read_csv(here("Input", "INPUT_EuroMix.csv")) 
     
     if (Lifestage == "Yes") {
       if (any(is.na(RawData$expAGE))) {
@@ -47,7 +47,7 @@
         Input <- RawData
       }
     } else {
-      RawData$expAGE <- 30 # Lifestage = "No" -> assign default expAGE
+      RawData$expAGE = 30 # Lifestage = "No" -> assign default expAGE
       Input <- RawData
     }
     
@@ -72,7 +72,7 @@
     expCONC_Dermal = 1E-3 # ug/kg/day concentration to be used only when both oral and dermal are used
     expCONC = expCONC_Oral + expCONC_Dermal # ug/kg/day concentration
     Tinput = 1 # for repeated exposure or so default = 1
-    tinterval = 1 # for repeated exposure or so default = 1
+    Tinterval = 1 # for repeated exposure or so default = 1
     expSTOP = 20*365 # time in days after which the exposure stopped
     
     # Subject-relevant information
@@ -124,8 +124,8 @@
                                    as.numeric(Input[i, "expCONC_Dermal"])),    # ug/kg/day concentration to be used only when both oral and dermal are used
           Tinput = ifelse(is.na(Input[i, "Tinput"]), 1,
                            as.numeric(Input[i, "Tinput"])),          # for repeated exposure or so default = 1
-          tinterval = ifelse(is.na(Input[i, "tinterval"]), 1,
-                              as.numeric(Input[i, "tinterval"])),    # for repeated exposure or so default = 1
+          Tinterval = ifelse(is.na(Input[i, "Tinterval"]), 1,
+                              as.numeric(Input[i, "Tinterval"])),    # for repeated exposure or so default = 1
           expSTOP = as.numeric(Input[i, "expSTOP"]),                # time in days after which the exposure stopped
           
           # Subject-relevant information
@@ -169,8 +169,8 @@
                                    as.numeric(Input[i, "expCONC_Dermal"])),    # ug/kg/day concentration to be used only when both oral and dermal are used
           Tinput = ifelse(is.na(Input[i, "Tinput"]), 1,
                            as.numeric(Input[i, "Tinput"])),          # for repeated exposure or so default = 1
-          tinterval = ifelse(is.na(Input[i, "tinterval"]), 1,
-                              as.numeric(Input[i, "tinterval"])),    # for repeated exposure or so default = 1
+          Tinterval = ifelse(is.na(Input[i, "Tinterval"]), 1,
+                              as.numeric(Input[i, "Tinterval"])),    # for repeated exposure or so default = 1
           expSTOP = as.numeric(Input[i, "expSTOP"]),                # time in days after which the exposure stopped
           
           # Subject-relevant information
@@ -211,7 +211,7 @@
         expCONC_Oral = expCONC_Oral, 
         expCONC_Dermal = expCONC_Dermal, 
         Tinput = Tinput, 
-        tinterval = tinterval, 
+        Tinterval = Tinterval, 
         expSTOP = expSTOP, 
         
         # Subject-relevant information
@@ -236,7 +236,7 @@
         expCONC_Oral = expCONC_Oral, 
         expCONC_Dermal = expCONC_Dermal, 
         Tinput = Tinput, 
-        tinterval = tinterval, 
+        Tinterval = Tinterval, 
         expSTOP = expSTOP, 
         
         # Subject-relevant information
