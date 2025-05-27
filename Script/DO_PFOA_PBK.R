@@ -24,7 +24,7 @@
   # Options ----
   
   # Choose if physiology should change with age ("Yes" to include physiological changes due to age and "No" to assume the same physiology over time)
-  Lifestage = "Yes" 
+  Lifestage = "No" 
   
   # Choose to include population or individual exposure ("Yes" to include population based and "No" to only run the model for one person)
   Population = "Yes" 
@@ -33,7 +33,7 @@
   GFR_type = "Flow"
   
   # Choose ID Range (a:b)
-  ID_range = 1:3
+  ID_range = 1:145
   
   
   # Load files
@@ -44,7 +44,7 @@
   # Load input ----
   if(Population == "Yes"){
     
-    RawData <- read_csv(here("Input", "INPUT_EuroMix.csv")) 
+    RawData <- read_csv(here("Input", "INPUT_EuroMix_test.csv")) 
     Input <- RawData %>% filter(Idcode %in% ID_range) # ID range
     
     if (Lifestage == "Yes") {
