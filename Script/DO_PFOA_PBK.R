@@ -24,7 +24,7 @@
   # Options ----
   
   # Choose if physiology should change with age ("Yes" to include physiological changes due to age and "No" to assume the same physiology over time)
-  Lifestage = "No" 
+  Lifestage = "Yes" 
   
   # Choose to include population or individual exposure ("Yes" to include population based and "No" to only run the model for one person)
   Population = "Yes" 
