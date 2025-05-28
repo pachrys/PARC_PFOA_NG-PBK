@@ -13,6 +13,7 @@ library(deSolve)
 library(PKNCA)
 library(pracma)
 library(showtext)
+library(purrr)
 font_add(family = "Garamond", regular = "GARA.TTF")
 showtext_auto()
 
@@ -62,11 +63,7 @@ summary(CRegression)
 
 
 # V1
-library(dplyr)
-library(purrr)
-library(readr)
-library(here)
-library(ggplot2)
+
 
 # Extract max predicted CP for each Idcode
 predicted_df <- map_dfr(RESULTS$OUT_RAW_data, ~ {
