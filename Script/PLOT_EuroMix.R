@@ -58,3 +58,46 @@ PredictedObserved.df <- PredictedObserved.df %>%
 
 CRegression <- lm(CP_final~CP_final_predicted, data=PredictedObserved.df)
 summary(CRegression)
+
+
+
+# V1
+library(dplyr)
+library(purrr)
+library(readr)
+library(here)
+library(ggplot2)
+
+# Extract max predicted CP for each Idcode
+predicted_df <- map_dfr(RESULTS$OUT_RAW_data, ~ {
+  data_frame <- .x
+  data_frame %>%
+    summarise(
+      Idcode = unique(Idcode),
+      Predicted_CP = max(CP, na.rm = TRUE)
+    )
+})
+
+measured_df <- read_csv(here("Input", "EM_PFOA_CP.csv")) %>%
+  rename(Measured_CP = PFOA_CP)  # ng/ml = ug/L so same unit, no conversion needed
+
+merged_df <- left_join(measured_df, predicted_df, by = "Idcode")
+
+regression_model <- lm(Measured_CP ~ Predicted_CP, data = merged_df)
+summary(regression_model)
+
+ggplot(merged_df, aes(x = factor(Idcode))) +
+  geom_point(aes(y = Measured_CP, color = "Measured"), alpha = 0.7) +
+  geom_point(aes(y = Predicted_CP, color = "Predicted"), alpha = 0.7) +
+  labs(
+    x = "Idcode",
+    y = "PFOA Concentration (ng/mL = ug/L)",
+    color = "Legend",
+    title = "Measured vs Predicted PFOA Plasma Concentration by Idcode"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+# V2
+

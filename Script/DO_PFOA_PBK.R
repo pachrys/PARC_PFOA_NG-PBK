@@ -33,7 +33,7 @@
   GFR_type = "Flow"
   
   # Choose ID Range (a:b)
-  ID_range = 1:145
+  ID_range = 1:142
   
   
   # Load files
@@ -44,7 +44,7 @@
   # Load input ----
   if(Population == "Yes"){
     
-    RawData <- read_csv(here("Input", "INPUT_EuroMix_test.csv")) 
+    RawData <- read_csv(here("Input", "INPUT_EuroMix.csv")) 
     Input <- RawData %>% filter(Idcode %in% ID_range) # ID range
     
     if (Lifestage == "Yes") {
@@ -55,12 +55,10 @@
         
       } else {
         Input <- RawData %>% filter(Idcode %in% ID_range) 
-        
       }
-    } else {
-      RawData$expAGE = 30 # Lifestage = "No" -> assign default expAGE
+    } else { # Lifestage = "No" & Population = "Yes"
       Input <- RawData %>% filter(Idcode %in% ID_range) 
-    }
+    } 
     
     nPeople <- as.numeric(nrow(Input)) # number of people
     Pop.RESULTS <- list(
@@ -70,7 +68,7 @@
       OUT_Plots = vector("list", nPeople) # could be removed if it's too heavy for R
     )
     
-    } else {
+    } else { # Lifestage = "No" & Population = "No"
     
     # Set exposure type, choose between "Oral", "Dermal", "Oral_Dermal" (if exposure is both Oral and Dermal), Inhalation"
     exposure_type = "Oral_Dermal"
@@ -84,7 +82,7 @@
     expCONC = expCONC_Oral + expCONC_Dermal # ug/kg/day concentration
     Tinput = 1 # for repeated exposure or so default = 1
     tinterval = 1 # for repeated exposure or so default = 1
-    expSTOP = 20*365 # time in days after which the exposure stopped
+    expSTOP = 50*365 # time in days after which the exposure stopped
     
     # Subject-relevant information
     expAGE = 30 # years old age at exposure if not provided then age argument is not used physiology is based on BW
@@ -93,7 +91,7 @@
     
     # Simulation relevant information
     Tstart = 0 # days start of the simulation
-    Tstop = 50*365 # days stop of the simulation
+    Tstop = 80*365 # days stop of the simulation
     Dt = 1 # days iteration steps (decrease/increase depending on run time)
     
     
