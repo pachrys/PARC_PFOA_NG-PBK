@@ -30,10 +30,10 @@
   Population = "Yes" 
   
   # Choose between age GFR ("Age") or renal plasma flow GFR ("Flow")
-  GFR_type = "Flow"
+  GFR_type = "Age"
   
   # Choose ID Range (a:b)
-  ID_range = 1:142 
+  ID_range = 1:5
   
   
   # Load files
@@ -44,7 +44,7 @@
   # Load input ----
   if(Population == "Yes"){
     
-    RawData <- read_csv(here("Input", "INPUT_EuroMix_2day.csv")) 
+    RawData <- read_csv(here("Input", "INPUT_EuroMix_20year.csv")) 
     Input <- RawData %>% filter(Idcode %in% ID_range) # ID range
     
     if (Lifestage == "Yes") {
@@ -78,7 +78,7 @@
     # Exposure-relevant information
     exposure_type = exposure_type # type of exposure
     expCONC_Oral = 0 # ug/kg/day concentration to be used only when both oral and dermal are used
-    expCONC_Dermal = 0.0 # ug/kg/day concentration to be used only when both oral and dermal are used
+    expCONC_Dermal = 0.03 # ug/kg/day concentration to be used only when both oral and dermal are used
     expCONC = expCONC_Oral + expCONC_Dermal # ug/kg/day concentration
     Tinput = 1 # for repeated exposure or so default = 1
     tinterval = 1 # for repeated exposure or so default = 1
@@ -129,7 +129,7 @@
           expCONC = as.numeric(Input[i, "expCONC"]),                           # ug/kg/day concentration (total exposure concentration)
           expCONC_Oral = ifelse(is.na(Input[i, "expCONC_Oral"]), 0,
                                  as.numeric(Input[i, "expCONC_Oral"])),        # ug/kg/day concentration to be used only when both oral and dermal are used
-          expCONC_Dermal = ifelse(is.na(Input[i, "expCONC_Dermal"]), 0,
+          expCONC_Dermal = 0.78 * ifelse(is.na(Input[i, "expCONC_Dermal"]), 0,
                                    as.numeric(Input[i, "expCONC_Dermal"])),    # ug/kg/day concentration to be used only when both oral and dermal are used
           Tinput = ifelse(is.na(Input[i, "Tinput"]), 1,
                            as.numeric(Input[i, "Tinput"])),          # for repeated exposure or so default = 1
