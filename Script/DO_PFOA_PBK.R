@@ -33,7 +33,7 @@
   GFR_type = "Flow"
   
   # Choose ID Range (a:b)
-  ID_range = 1:142
+  ID_range = 1:142 
   
   
   # Load files
@@ -44,7 +44,7 @@
   # Load input ----
   if(Population == "Yes"){
     
-    RawData <- read_csv(here("Input", "INPUT_EuroMix.csv")) 
+    RawData <- read_csv(here("Input", "INPUT_EuroMix_2day.csv")) 
     Input <- RawData %>% filter(Idcode %in% ID_range) # ID range
     
     if (Lifestage == "Yes") {
@@ -78,7 +78,7 @@
     # Exposure-relevant information
     exposure_type = exposure_type # type of exposure
     expCONC_Oral = 0 # ug/kg/day concentration to be used only when both oral and dermal are used
-    expCONC_Dermal = 1E-3 # ug/kg/day concentration to be used only when both oral and dermal are used
+    expCONC_Dermal = 0.0 # ug/kg/day concentration to be used only when both oral and dermal are used
     expCONC = expCONC_Oral + expCONC_Dermal # ug/kg/day concentration
     Tinput = 1 # for repeated exposure or so default = 1
     tinterval = 1 # for repeated exposure or so default = 1
