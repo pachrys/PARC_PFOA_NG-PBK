@@ -30,7 +30,7 @@
   Population = "Yes" 
   
   # Choose between age GFR ("Age") or renal plasma flow GFR ("Flow")
-  GFR_type = "Flow"
+  GFR_type = "Age"
   
   # Choose ID Range (a:b)
   ID_range = 1:142

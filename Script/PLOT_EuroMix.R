@@ -17,6 +17,7 @@ library(showtext)
 library(purrr)
 library(ggplot2)
 library(stats)
+
 font_add(family = "Garamond", regular = "GARA.TTF")
 showtext_auto()
 
@@ -29,6 +30,28 @@ dir.create(OUTPUT, recursive = TRUE)
 
 # Load measured CP per subject
 mPFOA_df <- read_csv(here("Input", "EM_PFOA_CP.csv"))
+
+# Extract sex from Input
+ext_sex <- function(sex_vec, idcode_vec) {
+  tibble(
+    Idcode = idcode_vec,
+    sex = sex_vec
+  )
+}
+
+sex_df <- ext_sex(Input$sex, Input$Idcode)
+
+
+# Extract expAGE from Input
+ext_expAGE <- function(expAGE_vec, idcode_vec) {
+  tibble(
+    Idcode = idcode_vec,
+    expAGE = expAGE_vec
+  )
+}
+
+expAGE_df <- ext_expAGE(Input$expAGE, Input$Idcode)
+
 
 # Extract expCONC from Input
 ext_expCONC <- function(expCONC_vec, idcode_vec) {
@@ -56,20 +79,6 @@ ext_pPFOA_CP <- function(result_list, expSTOP_vec) {
 pPFOA_CP_flow_df <- ext_pPFOA_CP(RESULTS_flow$OUT_RAW_data, Input$expSTOP)
 pPFOA_CP_age_df <- ext_pPFOA_CP(RESULTS_age$OUT_RAW_data, Input$expSTOP)
 
-# OR
-
-# # Extract predicted maximum CP (over predicts for old age Ids)
-# ext_max_pPFOA_CP <- function(result_list) {
-#   map_dfr(seq_along(result_list), ~ {
-#     data_i <- result_list[[.x]]
-#     tibble(
-#       Idcode = .x,
-#       pPFOA_CP = max(data_i$CP, na.rm = TRUE)
-#     )
-#   })
-# }
-# pPFOA_CP_flow_df <- ext_max_pPFOA_CP(RESULTS$OUT_RAW_data)
-
 
 # Extract Halflives
 ext_HalfLife <- function(analysed_list, idcode_vec) {
@@ -87,12 +96,13 @@ ext_HalfLife <- function(analysed_list, idcode_vec) {
 HalfLife_flow_df <- ext_HalfLife(RESULTS_flow$ANALYSED_data, Input$Idcode)
 HalfLife_age_df <- ext_HalfLife(RESULTS_age$ANALYSED_data, Input$Idcode)
 
+
 # Extract GFR for flow GFR
 ext_GFR_flow <- function(calc_params_list, idcode_vec) {
   map_dfr(seq_along(calc_params_list), function(i) {
     tibble(
       Idcode = idcode_vec[[i]],
-      GFR_flow = calc_params_list[[i]]$GFR
+      GFR.x = calc_params_list[[i]]$GFR
     )
   })
 }
@@ -117,7 +127,7 @@ ext_GFR_age <- function(physio_df, expSTOP_vec, sex_vec, idcode_vec) {
     
     tibble(
       Idcode = id,
-      GFR = gfr_value / 1.44    # (L/d -> ml/min)
+      GFR.y = gfr_value / 1.44    # (L/d -> ml/min)
     )
   })
 }
@@ -125,10 +135,12 @@ ext_GFR_age <- function(physio_df, expSTOP_vec, sex_vec, idcode_vec) {
 GFR_age_df <- ext_GFR_age(Physio.c, Input$expSTOP, Input$sex, Input$Idcode)
 
 
-# Merge dataframes and sort IDs ####  
+# Merge dataframes ####  
 merge_all <- function(
-    mPFOA_df, 
+    sex_df,
+    expAGE_df,
     expCONC_df,
+    mPFOA_CP_df,
     pPFOA_CP_flow_df,
     pPFOA_CP_age_df,
     HalfLife_flow_df, 
@@ -136,39 +148,26 @@ merge_all <- function(
     GFR_flow_df, 
     GFR_age_df
 ) {
-  merged_df <- mPFOA_df %>%
+  merged_df <- sex_df %>%
+    left_join(expAGE_df, by = "Idcode") %>%
     left_join(expCONC_df, by = "Idcode") %>%
+    left_join(mPFOA_CP_df, by = "Idcode") %>%
     left_join(pPFOA_CP_flow_df, by = "Idcode") %>%
     left_join(pPFOA_CP_age_df, by = "Idcode") %>%
     left_join(HalfLife_flow_df, by = "Idcode") %>%
     left_join(HalfLife_age_df, by = "Idcode") %>%
     left_join(GFR_flow_df, by = "Idcode") %>%
     left_join(GFR_age_df, by = "Idcode")
-  
-  # # Anonymize Idcodes
-  # set.seed(123)
-  # anons <- tibble(
-  #   Idcode = unique(merged_df$Idcode),
-  #   AnonID = paste0("ID_", sample(seq_along(unique(merged_df$Idcode))))
-  # )
-  # 
-  # merged_df <- merged_df %>%
-  #   left_join(anons, by = "Idcode")
-  
-  # Sort ID by increasing age
-  merged_df <- merged_df %>%
-    distinct(Idcode, expAGE) %>%
-    arrange(expAGE) %>%
-    mutate(ageID = factor(Idcode, levels = Idcode)) %>%
-    right_join(merged_df, by = "Idcode")
-  
+
   return(merged_df)
-  
+
 }
 
 PFOA_OUT_df <- merge_all(
-  mPFOA_df, 
+  sex_df,
+  expAGE_df,
   expCONC_df,
+  mPFOA_df,
   pPFOA_CP_flow_df,
   pPFOA_CP_age_df,
   HalfLife_flow_df, 
@@ -177,102 +176,231 @@ PFOA_OUT_df <- merge_all(
   GFR_age_df
 )
 
+# Sort IDs first by expAGE then Idcode for plotting
+ID_sort <- PFOA_OUT_df %>%
+  distinct(Idcode, expAGE) %>%
+  arrange(expAGE, Idcode) %>%
+  pull(Idcode)
 
-
+PFOA_OUT_df <- PFOA_OUT_df %>%
+  mutate(ageID = factor(Idcode, levels = ID_sort))
 
 
 # Plots ####
 
-## Fig 1. Measured vs. Predicted PFOA plasma concentrations ####
+## Fig 1. Plot measured vs. predicted plasma concentrations ####
 
-  # Pivot
   CP_long <- PFOA_OUT_df %>%
     pivot_longer(
       cols = c(mPFOA_CP, pPFOA_CP.x), #.x for flow .y for age
       names_to = "Type",
       values_to = "Concentration"
+    ) %>%
+  mutate(
+    Type = recode(Type,
+                  mPFOA_CP = "Measured",
+                  pPFOA_CP.x = "Predicted" # legend label
     )
-
-p_PFOA_CP <- ggplot(CP_long, aes(x = ageID, y = Concentration, color = Type)) +
-  geom_point(size = 3) +
-  geom_smooth(
-    aes(group = Type),
-    method = "lm",
-    se = FALSE,
-    linetype = "dashed",
-    size = 1
-  ) +
-  scale_y_log10()+
-  labs(
-    y = "PFOA Concentration in Plasma (ng/mL)",
-    color = "Measured vs Predicted"
-  ) +
-  theme_minimal() +
-  theme(
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank(),
-    axis.text.x = element_blank(),  
-    axis.ticks.x = element_blank()
   )
-  scale_color_manual(values = c("mPFOA_CP" = "darkorange", "pPFOA_CP" = "steelblue"))
-  scale_y_log10()
 
-  ggsave(filename = here(OUTPUT, "PFOA_CP.png"), 
+  CP_wide <- CP_long %>%
+    pivot_wider(names_from = Type, values_from = Concentration)
+
+  # Correlation
+  corr_val <- cor(CP_wide$Measured, CP_wide$Predicted, use = "complete.obs", method = "pearson")
+
+  p_PFOA_CP <- ggplot(CP_long, aes(x = ageID, y = Concentration, color = Type)) +
+    geom_point(size = 3) +
+    geom_smooth(
+      aes(group = Type),
+      method = "lm",
+      linetype = "dashed",
+      size = 1
+    ) +
+    scale_y_log10() + 
+    labs(
+      y = "PFOA Concentration in Plasma (ng/ml)",
+      color = "Measured vs Predicted"
+    ) +
+    annotate("text", x = Inf, y = Inf, label = paste0("r = ", round(corr_val, 2)),
+             hjust = 1.1, vjust = 1.5, size = 4, fontface = "italic") + 
+    theme_minimal() +
+    theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      axis.text.x = element_blank(),  
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_text(margin = margin(t = 15)), 
+      axis.title.y = element_text(margin = margin(r = 15))
+    ) + 
+    scale_color_manual(values = c("Measured" = "darkseagreen4", "Predicted" = "darkorchid3")) 
+
+  ggsave(filename = here(OUTPUT, "Fig1_CP.png"),
          dpi = 300,
-         width = 12,      
-         height = 8,      
+         width = 36,
+         height = 24,
          units = "cm")
 
+  p_PFOA_CP
 
-## Fig 2. Plot GFR vs Half-Life ####
+  
+## Fig 2. Plot half-lives vs. predicted plasma concentrations ####
+  
+  hl_pPFOA_long <- PFOA_OUT_df %>%
+    select(ageID, 
+           HalfLife_flow = HalfLife.x, 
+           HalfLife_age = HalfLife.y,
+           pPFOA_CP_flow = pPFOA_CP.x, 
+           pPFOA_CP_age = pPFOA_CP.y) %>%
+    pivot_longer(
+      cols = c(HalfLife_flow, HalfLife_age, pPFOA_CP_flow, pPFOA_CP_age),
+      names_to = c("Metric", "Type"),
+      names_pattern = "(.+)_(.+)$",
+      values_to = "Value"
+    ) %>%
+    pivot_wider(names_from = Metric, values_from = Value)
 
-  # Pivot table
+  p_hl_pPFOA <- ggplot(hl_pPFOA_long, aes(x = HalfLife, y = pPFOA_CP, color = Type)) +
+    geom_point(size = 3, alpha = 0.7) +
+    scale_y_log10() +
+    labs(
+      x = "Half-Life (years)",
+      y = "Predicted Plasma Concentration (ng/ml)",
+      color = "GFR Type"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.title.x = element_text(margin = margin(t = 15)), 
+      axis.title.y = element_text(margin = margin(r = 15))
+    ) +
+    scale_color_manual(values = c("flow" = "aquamarine3", "age" = "coral3"))
+  
+  ggsave(filename = here(OUTPUT, "Fig2_hl_CP.png"),
+         dpi = 300,
+         width = 36,
+         height = 24,
+         units = "cm")
+  
+  p_hl_pPFOA
+  
+  
+## Fig 3. Plot GFRs vs. predicted plasma concentrations ####  
+  
+  gfr_pPFOA_long <- PFOA_OUT_df %>%
+    select(ageID, GFR_flow = GFR.x, GFR_age = GFR.y, pPFOA_flow = pPFOA_CP.x, pPFOA_age = pPFOA_CP.y) %>%
+    pivot_longer(cols = -ageID, names_to = c("Metric", "Type"), names_sep = "_") %>%
+    pivot_wider(names_from = Metric, values_from = value)
+  
+  p_GFR_pPFOA <- ggplot(gfr_pPFOA_long, aes(x = GFR, y = pPFOA, color = Type)) +
+    geom_point(size = 3, alpha = 0.8) +
+    scale_y_log10() +
+    labs(x = "GFR (ml/min)", y = "Predicted Plasma PFOA (ng/ml)", color = "GFR Type") +
+    theme_minimal() +
+    scale_color_manual(values = c("flow" = "aquamarine3", "age" = "coral3"))
+  
+  ggsave(filename = here(OUTPUT, "Fig3_GFR_pPFOA.png"),
+         plot = p_GFR_pPFOA,
+         dpi = 300,
+         width = 36,
+         height = 24,
+         units = "cm")
+
+  p_GFR_pPFOA
+  
+
+## Fig 4. Plot GFRs vs. half-lives ####
+
   gfr_hl_long <- PFOA_OUT_df %>%
     select(ageID, GFR_flow = GFR.x, GFR_age = GFR.y,
            HalfLife_flow = HalfLife.x, HalfLife_age = HalfLife.y) %>%
-    pivot_longer(cols = everything(), names_to = c("Metric", "Type"), names_sep = "_") %>%
+    pivot_longer(cols = -ageID, names_to = c("Metric", "Type"), names_sep = "_") %>%
     pivot_wider(names_from = Metric, values_from = value)
   
-pGFR_HL <- ggplot(gfr_hl_long, aes(x = GFR, y = HalfLife, color = Type)) +
-  geom_point(size = 3, alpha = 0.7) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Correlation: GFR vs Half-Life (Flow vs Age)",
-       x = "GFR (mL/min)", y = "Half-Life (days)") +
-  theme_minimal()
+  p_GFR_HL <- ggplot(gfr_hl_long, aes(x = GFR, y = HalfLife, color = Type)) +
+    geom_point(size = 3, alpha = 0.7) +
+    labs(x = "GFR (ml/min)", y = "Half-Life (years)", color = "GFR Type") +
+    theme_minimal() +
+    theme(
+      axis.title.x = element_text(margin = margin(t = 15)), 
+      axis.title.y = element_text(margin = margin(r = 15))
+    ) +
+    scale_color_manual(values = c("flow" = "aquamarine3", "age" = "coral3"))
 
-  ggsave(filename = here(OUTPUT, "GFR_HL.png"), 
+  ggsave(filename = here(OUTPUT, "Fig4_GFR_hl.png"),
          dpi = 300,
-         width = 12,      
-         height = 8,      
+         width = 36,
+         height = 24,
          units = "cm")
 
+  p_GFR_HL
 
-## Fig 3. Plot expCONC vs Half-Life ####
 
-  # Pivot table
+## Fig 5. Plot expCONC vs half-lives ####
+
   expconc_hl_long <- PFOA_OUT_df %>%
     select(ageID, expCONC, HalfLife_flow = HalfLife.x, HalfLife_age = HalfLife.y) %>%
     pivot_longer(cols = starts_with("HalfLife"), names_to = "Type", names_prefix = "HalfLife_", values_to = "HalfLife")
 
-p_expCONC_HL <- ggplot(expconc_hl_long, aes(x = expCONC, y = HalfLife, color = Type)) +
-  geom_point(size = 3, alpha = 0.7) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Correlation: expCONC vs Half-Life",
-       x = "Experimental Concentration (mg/L)", y = "Half-Life (days)") +
-  theme_minimal()
+  p_expCONC_HL <- ggplot(expconc_hl_long, aes(x = expCONC, y = HalfLife, color = Type)) +
+    geom_point(size = 3, alpha = 0.7) +
+    scale_x_log10() +
+    labs( x = "Exposure Concentration (ug/kg/day)", y = "Half-Life (years)", color = "GFR Type") +
+    theme_minimal() +
+    theme(
+      axis.title.x = element_text(margin = margin(t = 15)), 
+      axis.title.y = element_text(margin = margin(r = 15))
+    ) +
+    scale_color_manual(values = c("flow" = "aquamarine3", "age" = "coral3"))
 
-  ggsave(filename = here(OUTPUT, "expCONC_HL.png"), 
+  ggsave(filename = here(OUTPUT, "Fig5_expCONC_HL.png"),
          dpi = 300,
-         width = 12,      
-         height = 8,      
+         width = 36,
+         height = 24,
          units = "cm")
 
+  p_expCONC_HL
   
+  
+## Fig 6. Plot expCONC vs predicted PFOA concentration ####
+
+  expconc_cp_long <- PFOA_OUT_df %>%
+    select(ageID, expCONC, pPFOA_CP_flow = pPFOA_CP.x, pPFOA_CP_age = pPFOA_CP.y) %>%
+    pivot_longer(
+      cols = starts_with("pPFOA_CP"),
+      names_to = "Type",
+      names_prefix = "pPFOA_CP_",
+      values_to = "Predicted_CP"
+    )
+  
+  p_expCONC_CP <- ggplot(expconc_cp_long, aes(x = expCONC, y = Predicted_CP, color = Type)) +
+    geom_point(size = 3, alpha = 0.7) +
+    geom_smooth(method = "lm", se = FALSE) +
+    scale_x_log10() +
+    scale_y_log10() +
+    labs(
+      x = "Exposure Concentration (ug/kg/day)",
+      y = "Predicted Plasma Concentration (ng/ml)",
+      color = "GFR Type"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.title.x = element_text(margin = margin(t = 15)), 
+      axis.title.y = element_text(margin = margin(r = 15))
+    ) +
+    scale_color_manual(values = c("flow" = "aquamarine3", "age" = "coral3"))
+  
+  ggsave(filename = here(OUTPUT, "Fig6_expCONC_CP.png"),
+         dpi = 300,
+         width = 36,
+         height = 24,
+         units = "cm")
+
+  p_expCONC_CP
+  
+
 # Data Analysis ####
   
-# ## Regression ###
-# regression_mod <- lm(mPFOA_CP ~ pPFOA_CP, data = PFOA_CP_df)
-# summary(regression_mod)
+## Regression ####
 
 # Flow-based model
 lm_flow <- lm(mPFOA_CP ~ pPFOA_CP.x, data = PFOA_OUT_df)
@@ -282,29 +410,53 @@ summary(lm_flow)
 lm_age <- lm(mPFOA_CP ~ pPFOA_CP.y, data = PFOA_OUT_df)
 summary(lm_age)
 
-library(ggplot2)
 
-# Figure 4. Linear regression measured vs. predicted
+## Fig 7. Plot measured and predicted and flow vs. age linear regression ####
 
-  # Pivot
-  pfoa_long <- PFOA_OUT_df %>%
+  PFOA_lm_long <- PFOA_OUT_df %>%
     select(ageID, mPFOA_CP, pPFOA_flow = pPFOA_CP.x, pPFOA_age = pPFOA_CP.y) %>%
     pivot_longer(cols = starts_with("pPFOA"), names_to = "Model", values_to = "pPFOA_CP")
+  
+  p_PFOA_lm <- ggplot(PFOA_lm_long, aes(x = pPFOA_CP, y = mPFOA_CP, color = Model)) +
+    geom_point(size = 3, alpha = 0.8) +
+    geom_smooth(method = "lm", se = FALSE) +
+    scale_x_log10() +
+    scale_y_log10() +
+    labs(
+      x = "Predicted Plasma PFOA (ng/ml)",
+      y = "Measured Plasma PFOA (ng/ml)",
+      color = "GFR Type"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.title.x = element_text(margin = margin(t = 15)),
+      axis.title.y = element_text(margin = margin(r = 15))
+    ) +
+    scale_color_manual(values = c("pPFOA_flow" = "aquamarine3", "pPFOA_age" = "coral3"))
 
-p_PFOA_lm <- ggplot(pfoa_long, aes(x = pPFOA_CP, y = mPFOA_CP, color = Model)) +
-  geom_point(size = 3, alpha = 0.8) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Regression Fit: Predicted vs Measured Plasma PFOA",
-       x = "Predicted pPFOA_CP", y = "Measured mPFOA_CP") +
-  theme_minimal()
-
-  ggsave(filename = here(OUTPUT, "PFOA_lm.png"), 
+  ggsave(filename = here(OUTPUT, "Fig7_lm.png"),
          dpi = 300,
-         width = 12,      
-         height = 8,      
+         width = 36,
+         height = 24,
          units = "cm")
   
+p_PFOA_lm
 
-# Compare performance
+
+# Compare linear regression
 broom::glance(lm_flow)
 broom::glance(lm_age)
+
+
+
+# # Anonymize Idcodes
+# # Can be added in the merge_all before calling the function to randomize IDs
+# set.seed(123)
+# anons <- tibble(
+#   Idcode = unique(merged_df$Idcode),
+#   AnonID = paste0("ID_", sample(seq_along(unique(merged_df$Idcode))))
+# )
+# 
+# merged_df <- merged_df %>%
+#   left_join(anons, by = "Idcode")
+
