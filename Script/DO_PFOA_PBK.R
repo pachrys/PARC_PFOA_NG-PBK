@@ -30,7 +30,7 @@
   Population = "Yes" 
   
   # Choose between age GFR ("Age") or renal plasma flow GFR ("Flow")
-  GFR_type = "Age"
+  GFR_type = "Flow"
   
   # Choose ID Range (a:b)
   ID_range = 1:142
@@ -44,7 +44,7 @@
   # Load input ----
   if(Population == "Yes"){
     
-    RawData <- read_csv(here("Input", "INPUT_EuroMix_25year.csv")) 
+    RawData <- read_csv(here("Input", "INPUT_EuroMix_20year.csv")) 
     Input <- RawData %>% filter(Idcode %in% ID_range) # ID range
     
     if (Lifestage == "Yes") {
