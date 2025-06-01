@@ -28,6 +28,13 @@ dir.create(OUTPUT, recursive = TRUE)
 
 # Data Extraction ####
 
+# Load RESULTS and rename
+
+# RESULTS_flow <- RESULTS #rm(RESULTS)
+# load(RESULTS.R)
+# RESULTS_age <- RESULTS #rm(RESULTS)
+
+
 # Load measured CP per subject
 mPFOA_CP_df <- read_csv(here("Input", "EM_PFOA_CP.csv"))
 
@@ -66,17 +73,19 @@ pPFOA_CP_age_df <- ext_pPFOA_CP(RESULTS_age$OUT_RAW_data, Input$expSTOP)
 # OR
 
 # Extract predicted maximum CP (over predicts for old age Ids)
-# ext_max_pPFOA_CP <- function(result_list) {
-#   map_dfr(seq_along(result_list), ~ {
-#     j <- result_list[[.x]]
-#     tibble(
-#       Idcode = .x,
-#       pPFOA_CP = max(j$CP, na.rm = TRUE)
-#     )
-#   })
-# }
+
+#   ext_max_pPFOA_CP <- function(result_list) {
+#     map_dfr(seq_along(result_list), ~ {
+#       j <- result_list[[.x]]
+#       tibble(
+#         Idcode = .x,
+#         pPFOA_CP = max(j$CP, na.rm = TRUE)
+#       )
+#     })
+#   }
 # 
-# pPFOA_CP_flow_df <- ext_max_pPFOA_CP(RESULTS$OUT_RAW_data)
+# pPFOA_CP_flow_df <- ext_max_pPFOA_CP(RESULTS_flow$OUT_RAW_data)
+# pPFOA_CP_age_df <- ext_max_pPFOA_CP(RESULTS_age$OUT_RAW_data)
 
 
 # Extract Halflives
@@ -166,14 +175,14 @@ PFOA_OUT_df <- PFOA_OUT_df %>%
 
   CP_long <- PFOA_OUT_df %>%
     pivot_longer(
-      cols = c(mPFOA_CP, pPFOA_CP.x), #.x for flow .y for age
+      cols = c(mPFOA_CP, pPFOA_CP.y), #.x for flow .y for age
       names_to = "Type",
       values_to = "Concentration"
     ) %>%
   mutate(
     Type = recode(Type,
                   mPFOA_CP = "Measured",
-                  pPFOA_CP.x = "Predicted" # legend label
+                  pPFOA_CP.y = "Predicted" # legend label
     )
   )
 
@@ -221,14 +230,14 @@ p_PFOA_CPa
 
   CP_long <- PFOA_OUT_df %>%
     pivot_longer(
-      cols = c(mPFOA_CP, pPFOA_CP.x), # .x for flow, .y for age
+      cols = c(mPFOA_CP, pPFOA_CP.y), # .x for flow, .y for age
       names_to = "Type",
       values_to = "Concentration"
     ) %>%
     mutate(
       Type = recode(Type,
                     mPFOA_CP = "Measured",
-                    pPFOA_CP.x = "Predicted"
+                    pPFOA_CP.y = "Predicted"
       ),
       Sex = recode(sex, M = "Male", F = "Female")
     )
@@ -275,14 +284,14 @@ p_PFOA_CPb
   
   CP_long <- PFOA_OUT_df %>%
     pivot_longer(
-      cols = c(mPFOA_CP, pPFOA_CP.x),
+      cols = c(mPFOA_CP, pPFOA_CP.y),
       names_to = "Type",
       values_to = "Concentration"
     ) %>%
     mutate(
       Type = recode(Type,
                     mPFOA_CP = "Measured",
-                    pPFOA_CP.x = "Predicted"),
+                    pPFOA_CP.y = "Predicted"),
       Exposure = recode(exposure_type,
                         Oral_Dermal = "Oral + Dermal",
                         Oral = "Oral")
