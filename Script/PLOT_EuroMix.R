@@ -4,8 +4,7 @@
 # Date: 27-05-2025
 # --------------------------------------------------------------------------- #
 
-# rm(list=ls()) # to clear out the global environment 
-# Input and Physio.c needed
+# rm(list=ls()) # to clear out the global environment
 
 # Packages
 library(here)
@@ -34,24 +33,24 @@ dir.create(OUTPUT, recursive = TRUE)
 # load(RESULTS.R)
 # RESULTS_age <- RESULTS #rm(RESULTS)
 
-
-# Load measured CP per subject
-mPFOA_CP_df <- read_csv(here("Input", "EM_PFOA_CP.csv"))
-
+# Load raw data
+Physio.c <- read_csv(here("Input", "PhysioVariables.csv"))
+Input <- read_csv(here("Input", "INPUT_EuroMix_20year.csv")) 
+mPFOA_CP_df <- read_csv(here("Input", "EM_PFOA_CP.csv")) 
 
 # Extract from Input
 
-  extract_var <- function(var_name) {
+  ext_var <- function(var_name) {
     tibble(
       Idcode = Input$Idcode,
       !!var_name := Input[[var_name]]
     )
   }
-  
-sex_df       <- extract_var("sex")
-exptype_df   <- extract_var("exposure_type")
-expAGE_df    <- extract_var("expAGE")
-expCONC_df   <- extract_var("expCONC")
+
+sex_df <- ext_var("sex")
+exptype_df <- ext_var("exposure_type")
+expAGE_df <- ext_var("expAGE")
+expCONC_df <- ext_var("expCONC")
   
 
 # Extract predicted CP at expSTOP
@@ -169,45 +168,99 @@ PFOA_OUT_df <- PFOA_OUT_df %>%
   mutate(ageID = factor(Idcode, levels = ID_sort))
 
 
+PFOA_Oral_df <- PFOA_OUT_df %>% filter(exposure_type == "Oral")
+PFOA_OD_df <- PFOA_OUT_df %>% filter(exposure_type == "Oral_Dermal")
+
+# write.csv(PFOA_OUT_df, here("Input", "PFOA_OUT_df.csv"), row.names = FALSE)
+
+
+# Data Analysis ####
+
+## Regression and Correlation ####
+
+# Flow-based model
+lm_flow <- lm(mPFOA_CP ~ pPFOA_CP.x, data = PFOA_OUT_df)
+summary(lm_flow)
+
+# Age-based model
+lm_age <- lm(mPFOA_CP ~ pPFOA_CP.y, data = PFOA_OUT_df)
+summary(lm_age)
+
+
+# Halflife GFR
+lm_hlgfr_flow <- lm(HalfLife.x ~ GFR.x, data = PFOA_OUT_df)
+
+
+lm_hlgfr_age <- lm(HalfLife.y ~ GFR.y, data = PFOA_OUT_df)
+
+summary(lm_hlgfr_flow)
+summary(lm_hlgfr_age)
+
+# HalfLife GFR Corr
+corr_flow <- cor(PFOA_OUT_df$GFR.x, PFOA_OUT_df$HalfLife.x, use = "complete.obs", method = "pearson")
+corr_age <- cor(PFOA_OUT_df$GFR.y, PFOA_OUT_df$HalfLife.y, use = "complete.obs", method = "pearson")
+
+
+
+
 # Plots ####
 
 ## Fig 1a. Plot measured vs. predicted plasma concentrations ####
 
-  CP_long <- PFOA_OUT_df %>%
-    pivot_longer(
-      cols = c(mPFOA_CP, pPFOA_CP.y), #.x for flow .y for age
-      names_to = "Type",
-      values_to = "Concentration"
-    ) %>%
-  mutate(
-    Type = recode(Type,
-                  mPFOA_CP = "Measured",
-                  pPFOA_CP.y = "Predicted" # legend label
-    )
-  )
+  # # Flow-based model
+# lm_flow <- lm(mPFOA_CP ~ pPFOA_CP.x, data = PFOA_OUT_df)
+# summary(lm_flow)
 
-  CP_wide <- CP_long %>%
-    pivot_wider(names_from = Type, values_from = Concentration)
 
-  # Correlation
-  corr_val <- cor(CP_wide$Measured, CP_wide$Predicted, use = "complete.obs", method = "pearson")
+  
+  CP_wide <- PFOA_OD_df %>%
+    select(sex, mPFOA_CP, pPFOA_CP.x) %>%
+    rename(
+      Measured = "mPFOA_CP",
+      Predicted = "pPFOA_CP.x") 
 
-  p_PFOA_CPa <- ggplot(CP_long, aes(x = ageID, y = Concentration, color = Type)) +
-    geom_point(size = 3) +
-    geom_smooth(
-      aes(group = Type),
-      method = "lm",
-      linetype = "dashed",
-      size = 1
-    ) +
+ CP_wide_F <- CP_wide %>% filter(sex == "F")
+ CP_wide_M <- CP_wide %>% filter(sex == "M")
+ 
+CRegression <- lm(Predicted~Measured, data=CP_wide_M)
+summary(CRegression)
+
+CRegression_plot <- CRegression %>%
+  # Plot in log scale
+  ggplot(aes(x = Measured, y = Predicted)) +
+  
+  # # Linear regression line
+  # geom_smooth(method = 'lm', color = "black", se = TRUE) +
+  # # reference lines
+  # geom_abline(intercept = 0, slope = 1, linetype = "solid", linewidth = 0.5, color = "grey50") +  
+  # geom_abline(intercept = log(1.1), slope = 1, linetype = "dashed", linewidth = 0.5, color = "grey50") +  # +10% line
+  # geom_abline(intercept = log(0.9), slope = 1, linetype = "dashed", linewidth = 0.5, color = "grey50") +  # -10% line
+  # geom_abline(intercept = log(2), slope = 1, linetype = "dotted", linewidth = 0.5, color = "grey50") +  # 2-fold upper
+  # geom_abline(intercept = log(0.5), slope = 1, linetype = "dotted", linewidth = 0.5, color = "grey50") +  # 2-fold lower
+  
+  # add the actual points (these are the observed points)
+  geom_point(color = "darkred", size = 1) +
+  
+  # theme etc
+  theme_minimal()+
+  theme(plot.title = element_text(size = 10, margin = margin(b = 20)),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 8))
+
+CRegression_plot
+
+
+  p_PFOA_CPtest <- ggplot(CP_wide, aes(x = Measured, y = Predicted)) +
+    geom_point(size = 3, color = "darkorchid3") +
+    geom_smooth(method = "lm", linetype = "dashed", linewidth = 1) +
+    scale_x_log10() +
     scale_y_log10() +
     labs(
-      y = "PFOA Concentration in Plasma (ng/ml)",
+      x = "Measured plasma PFOA (ng/ml)",
+      y = "Predicted plasma PFOA (ng/ml)",
       color = "Measured vs Predicted"
     ) +
-    annotate("text", x = Inf, y = Inf, label = paste0("r = ", round(corr_val, 2)),
-             hjust = 1.1, vjust = 1.5, size = 4, fontface = "italic") +
-    theme_minimal(base_size = 18) +
+    theme_minimal(base_size = 20) +
     theme(
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
@@ -215,8 +268,7 @@ PFOA_OUT_df <- PFOA_OUT_df %>%
       axis.ticks.x = element_blank(),
       axis.title.x = element_text(margin = margin(t = 15)),
       axis.title.y = element_text(margin = margin(r = 15))
-    ) +
-    scale_color_manual(values = c("Measured" = "darkseagreen4", "Predicted" = "darkorchid3"))
+    )
 
   ggsave(filename = here(OUTPUT, "Fig1a_CP.png"),
          dpi = 300,
@@ -226,7 +278,9 @@ PFOA_OUT_df <- PFOA_OUT_df %>%
 
 p_PFOA_CPa
 
-## Fig 1b. Plot measured vs. predicted plasma concentrations (by sex) ####
+
+
+## Fig 1b. Plot age vs. measured and predicted plasma concentrations (by sex) ####
 
   CP_long <- PFOA_OUT_df %>%
     pivot_longer(
@@ -245,8 +299,11 @@ p_PFOA_CPa
   CP_wide <- CP_long %>%
     pivot_wider(names_from = Type, values_from = Concentration)
   
+  # # Correlation
+  # corr_val <- cor(CP_wide$Measured, CP_wide$Predicted, use = "complete.obs", method = "pearson")
+  
   # Correlation
-  corr_val <- cor(CP_wide$Measured, CP_wide$Predicted, use = "complete.obs", method = "pearson")
+  # corr_val <- cor(PFOA_OUT_df$GFR.x, PFOA_OUT_df$HalfLife.x, use = "complete.obs", method = "pearson")
   
   p_PFOA_CPb <- ggplot(CP_long, aes(x = ageID, y = Concentration, color = Type)) +
     geom_point(aes(shape = Sex), size = 3, stroke = 1, fill = "white") +
@@ -261,12 +318,11 @@ p_PFOA_CPa
     ) +
     annotate("text", x = Inf, y = Inf, label = paste0("r = ", round(corr_val, 2)),
              hjust = 1.1, vjust = 1.5, size = 4, fontface = "italic") +
-    theme_minimal(base_size = 18) +
+    theme_minimal(base_size = 20) +
     theme(
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
-      axis.text.x = element_blank(),
-      axis.ticks.x = element_blank(),
+
       axis.title.x = element_text(margin = margin(t = 15)),
       axis.title.y = element_text(margin = margin(r = 15))
     )
@@ -316,7 +372,7 @@ p_PFOA_CPb
     ) +
     annotate("text", x = Inf, y = Inf, label = paste0("r = ", round(corr_val, 2)),
              hjust = 1.1, vjust = 1.5, size = 4, fontface = "italic") +
-    theme_minimal(base_size = 18) +
+    theme_minimal(base_size = 20) +
     theme(
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
@@ -359,7 +415,7 @@ p_PFOA_CPc
       y = "Predicted Plasma Concentration (ng/ml)",
       color = "GFR Type"
     ) +
-    theme_minimal(base_size = 18) +
+    theme_minimal(base_size = 20) +
     theme(
       axis.title.x = element_text(margin = margin(t = 15)), 
       axis.title.y = element_text(margin = margin(r = 15))
@@ -386,7 +442,7 @@ p_hl_pPFOA
     geom_point(size = 3, alpha = 0.8) +
     scale_y_log10() +
     labs(x = "GFR (ml/min)", y = "Predicted Plasma PFOA (ng/ml)", color = "GFR Type") +
-    theme_minimal(base_size = 18) +
+    theme_minimal(base_size = 20) +
     scale_color_manual(values = c("flow" = "aquamarine3", "age" = "coral3"))
   
   ggsave(filename = here(OUTPUT, "Fig3_GFR_pPFOA.png"),
@@ -406,20 +462,20 @@ p_GFR_pPFOA
     pivot_longer(cols = -ageID, names_to = c("Metric", "Type"), names_sep = "_") %>%
     pivot_wider(names_from = Metric, values_from = value)
   
-  p_GFR_HL <- ggplot(gfr_hl_long, aes(x = GFR, y = HalfLife, color = Type)) +
-    geom_point(size = 3, alpha = 0.7) +
-    labs(x = "GFR (ml/min)", y = "Half-Life (years)", color = "GFR Type") +
-    theme_minimal(base_size = 18) +
+  p_GFR_HL <- ggplot(gfr_hl_long, aes(x = HalfLife, y = GFR, color = Type)) +
+    geom_point(size = 2, alpha = 0.7) +
+    labs(x = "Half-Life (years)", y = "GFR (ml/min)", color = "GFR Type") +
+    theme_minimal(base_size = 20)+
     theme(
-      axis.title.x = element_text(margin = margin(t = 15)), 
-      axis.title.y = element_text(margin = margin(r = 15))
+      axis.title.x = element_text(margin = margin(t = 5)), 
+      axis.title.y = element_text(margin = margin(r = 5))
     ) +
     scale_color_manual(values = c("flow" = "aquamarine3", "age" = "coral3"))
-
+  
   ggsave(filename = here(OUTPUT, "Fig4_GFR_hl.png"),
          dpi = 300,
-         width = 24,
-         height = 16,
+         width = 12,
+         height = 8,
          units = "cm")
 
 p_GFR_HL
@@ -435,7 +491,7 @@ p_GFR_HL
     geom_point(size = 3, alpha = 0.7) +
     scale_x_log10() +
     labs( x = "Exposure Concentration (ug/kg/day)", y = "Half-Life (years)", color = "GFR Type") +
-    theme_minimal(base_size = 18) +
+    theme_minimal(base_size = 20) +
     theme(
       axis.title.x = element_text(margin = margin(t = 15)), 
       axis.title.y = element_text(margin = margin(r = 15))
@@ -451,7 +507,9 @@ p_GFR_HL
 p_expCONC_HL
   
   
-## Fig 6. Plot expCONC vs predicted PFOA concentration ####
+## Fig 6. Plot expCONC vs predicted PFOA concentration #### 
+
+# Measured
 
   expconc_cp_long <- PFOA_OUT_df %>%
     select(ageID, expCONC, pPFOA_CP_flow = pPFOA_CP.x, pPFOA_CP_age = pPFOA_CP.y) %>%
@@ -472,7 +530,7 @@ p_expCONC_HL
       y = "Predicted Plasma Concentration (ng/ml)",
       color = "GFR Type"
     ) +
-    theme_minimal(base_size = 18) +
+    theme_minimal(base_size = 20) +
     theme(
       axis.title.x = element_text(margin = margin(t = 15)), 
       axis.title.y = element_text(margin = margin(r = 15))
@@ -490,7 +548,7 @@ p_expCONC_CP
 
 # Data Analysis ####
   
-## Regression ####
+## Regression and Correlation ####
 
 # Flow-based model
 lm_flow <- lm(mPFOA_CP ~ pPFOA_CP.x, data = PFOA_OUT_df)
@@ -499,6 +557,43 @@ summary(lm_flow)
 # Age-based model
 lm_age <- lm(mPFOA_CP ~ pPFOA_CP.y, data = PFOA_OUT_df)
 summary(lm_age)
+
+
+# Halflife GFR
+lm_hlgfr_flow <- lm(HalfLife.x ~ GFR.x, data = PFOA_OUT_df)
+
+
+lm_hlgfr_age <- lm(HalfLife.y ~ GFR.y, data = PFOA_OUT_df)
+
+summary(lm_hlgfr_flow)
+summary(lm_hlgfr_age)
+
+# HalfLife GFR Corr
+# Correlation
+corr_flow <- cor(PFOA_OUT_df$GFR.x, PFOA_OUT_df$HalfLife.x, use = "complete.obs", method = "pearson")
+corr_age <- cor(PFOA_OUT_df$GFR.y, PFOA_OUT_df$HalfLife.y, use = "complete.obs", method = "pearson")
+
+# Plot Lms
+GFR_hl_flow <- corr_flow %>%   ggplot(aes(x = GFR.x, y = HalfLife.x)) +   geom_smooth(method = 'lm', color = "black", se = TRUE) +   geom_point(color = "darkred", size = 1) +
+  theme_minimal()+
+  theme(plot.title = element_text(size = 10, margin = margin(b = 20)),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 8)) +   labs(title = "Correlation between GFR and Halflife", x = "GFR", y = "HalfLife") +
+  annotate("text", x = Inf, y = Inf, label = paste0("r = ", round(corr_flow, 2)),
+           hjust = 1.1, vjust = 1.5, size = 4, fontface = "italic") +
+GFR_hl_flow
+
+
+GFR_hl_age <- corr_age %>%   ggplot(aes(x = GFR.y, y = HalfLife.y)) +   geom_smooth(method = 'lm', color = "black", se = TRUE) +   geom_point(color = "darkred", size = 1) +
+  theme_minimal()+
+  theme(plot.title = element_text(size = 10, margin = margin(b = 20)),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 8)) +   labs(title = "Correlation between GFR and Halflife", x = "GFR", y = "HalfLife") +
+  annotate("text", x = Inf, y = Inf, label = paste0("r = ", round(corr_age, 2)),
+           hjust = 1.1, vjust = 1.5, size = 4, fontface = "italic") +
+GFR_hl_age
+
+
 
 
 ## Fig 7. Plot measured and predicted and flow vs. age linear regression ####
@@ -517,7 +612,7 @@ summary(lm_age)
       y = "Measured Plasma PFOA (ng/ml)",
       color = "GFR Type"
     ) +
-    theme_minimal(base_size = 18) +
+    theme_minimal(base_size = 20) +
     theme(
       axis.title.x = element_text(margin = margin(t = 15)),
       axis.title.y = element_text(margin = margin(r = 15))

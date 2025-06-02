@@ -24,12 +24,13 @@ dir.create(OUTPUT, recursive = TRUE)
 # Should be used together with the INPUT_dummy.csv file and simulation results after running it
 
 ObsHalfLifes <- read_csv(here("Input", "HalfLifes.csv"))
-Oral.F <- RESULTS$ANALYSED_data[[1]]$HalfLife
-Oral.M <- RESULTS$ANALYSED_data[[3]]$HalfLife
-Dermal.F <- RESULTS$ANALYSED_data[[2]]$HalfLife
-Inhalation.F <- RESULTS$ANALYSED_data[[2]]$HalfLife
+# Oral.F <- RESULTS$ANALYSED_data[[1]]$HalfLife
+# Oral.M <- RESULTS$ANALYSED_data[[3]]$HalfLife
+# Dermal.F <- RESULTS$ANALYSED_data[[2]]$HalfLife
+# Inhalation.F <- RESULTS$ANALYSED_data[[2]]$HalfLife
 
 # Prepare observed data
+
 
 Observed.df <- ObsHalfLifes %>%
   filter(species == "human",
@@ -48,60 +49,71 @@ Observed2.df <- Observed.df %>%
 Observed.df <- rbind(Observed.df, Observed2.df)
 
 # Prepare predicted data for each Exposure and sex
-Predicted.df <- data.frame(
-  Exposure = c(rep("Oral", length(c(Oral.F, Oral.M))),
-               rep("Dermal", length(Dermal.F)),
-               rep("Inhalation", length(Inhalation.F))),
-  Sex = c(rep("F", length(Oral.F)),
-          rep("M", length(Oral.M)),
-          rep("F", length(Dermal.F)),
-          rep("F", length(Inhalation.F))), 
-  HalfLife = c(Oral.F, Oral.M, Dermal.F, Inhalation.F),
-  Origin = "Predicted") %>% 
-  mutate(
-    HalfLife = as.numeric(str_remove(HalfLife, "_years")),
-    value = case_when(
-      Sex == "F" ~ 0.75,  
-      Sex == "M" ~ 1.5   
-    )
-  )
+# Predicted.df <- data.frame(
+#   Exposure = c(rep("Oral", length(c(Oral.F, Oral.M))),
+#                rep("Dermal", length(Dermal.F)),
+#                rep("Inhalation", length(Inhalation.F))),
+#   Sex = c(rep("F", length(Oral.F)),
+#           rep("M", length(Oral.M)),
+#           rep("F", length(Dermal.F)),
+#           rep("F", length(Inhalation.F))), 
+#   HalfLife = c(Oral.F, Oral.M, Dermal.F, Inhalation.F),
+#   Origin = "Predicted") %>% 
+#   mutate(
+#     HalfLife = as.numeric(str_remove(HalfLife, "_years")),
+#     value = case_when(
+#       Sex == "F" ~ 0.75,  
+#       Sex == "M" ~ 1.5   
+#     )
+#   )
+
+PFOA_OUT_df <- read_csv(here("Input", "PFOA_OUT_df.csv")) 
+
+Predicted.df <- PFOA_OUT_df %>%
+  select(sex, HalfLife.x) %>% 
+    mutate(
+    value = if_else(sex == "F", 0.75, 1.5),
+    Origin = "Predicted"
+  ) %>%
+  rename(HalfLife = "HalfLife.x")
+
 
 
 # Plot
-NoLifestageHalf <- 
+hl_violin <- 
   ggplot() +
   geom_violin(data = Observed.df, aes(x = 0.75, y = HalfLife), 
               fill = "grey89", color = NA, width = 0.5, trim = FALSE) +
   geom_point(data = Observed.df, aes(x = 0.75, y = HalfLife, size = n),
-             color = "grey70", alpha = 0.5, position = position_jitter(width = 0.05)) +
-  geom_point(data = filter(Predicted.df, Sex == "F"), 
-             aes(x = 0.75, y = HalfLife, color = Exposure), 
-             shape = 18, size = 5, alpha = 0.9, position = position_jitter(width = 0.25)) +
+             color = "grey70", alpha = 0.5, position = position_jitter(width = 0.04)) +
+  geom_point(data = filter(Predicted.df, sex == "F"), 
+             color = "darkorchid2",
+             aes(x = 0.75, y = HalfLife), 
+             shape = 18, size = 3.5, alpha = 0.5, position = position_jitter(width = 0.04)) +
   
   geom_violin(
     data = Observed.df, aes(x = 1.5, y = HalfLife),
     fill = "grey89", color = NA, width = 0.5, trim = FALSE) +
   geom_point(data = Observed.df, aes(x = 1.5, y = HalfLife, size = n),
-             color = "grey70", alpha = 0.5, position = position_jitter(width = 0.05)) +
-  geom_point(data = filter(Predicted.df, Sex == "M"),
-             aes(x = 1.5, y = HalfLife, color = Exposure),
-             shape = 18, size = 5,  alpha = 0.9, position = position_jitter(width = 0.01)) +
-  
-  scale_color_manual(values = c("Oral" = "#8934AA",
-                                "Dermal" = "#238EFF", 
-                                "Inhalation" = "#F5D475")) +
+             color = "grey70", alpha = 0.5, position = position_jitter(width = 0.04)) +
+  geom_point(data = filter(Predicted.df, sex == "M"),
+             color = "cornflowerblue",
+             aes(x = 1.5, y = HalfLife),
+             shape = 18, size = 3.5,  alpha = 0.5, position = position_jitter(width = 0.04)) +
   scale_x_continuous(breaks = c(0.75, 1.5),       
                      labels = c("Female", "Male")) + 
   scale_size_continuous(range = c(1, 5)) +
   
-  labs(x = "", y = "Half life (years)") +
+  labs(x = "", y = "Half-life (years)") +
   guides(size = guide_legend(title = "HBM sample size")) +
-  theme_minimal() +
+  theme_minimal(base_size = 20) +
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 11),
         legend.position = "right")
-NoLifestageHalf
-ggsave(filename = here(OUTPUT, "NoLifestageHalf.life.png"), 
+
+hl_violin
+
+ggsave(filename = here(OUTPUT, "Hlviolin_flow2.png"), 
        dpi = 300,
        width = 12,      
        height = 8,      
