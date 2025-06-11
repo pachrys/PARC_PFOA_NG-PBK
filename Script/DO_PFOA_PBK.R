@@ -4,7 +4,7 @@
 # Date: 14-04-2025
 # --------------------------------------------------------------------------- #
 
-  rm(list=ls()) 
+  rm(list=ls())
   
   # Packages
   library(here)
@@ -33,7 +33,7 @@
   GFR_type = "Flow"
   
   # Choose ID Range (a:b)
-  ID_range = 1:142
+  ID_range = 1:1
   
   
   # Load files
@@ -51,14 +51,15 @@
       if (any(is.na(RawData$expAGE))) {
         warning("Removing ", sum(is.na(RawData$expAGE)), " samples with missing expAGE")
         RawData <- filter(!is.na(expAGE))
-        Input <- RawData %>% filter(Idcode %in% ID_range) 
+      }  
         
-      } else {
-        Input <- RawData %>% filter(Idcode %in% ID_range) 
-      }
-    } else { # Lifestage = "No" & Population = "Yes"
+      Input <- RawData %>% filter(Idcode %in% ID_range)
+      
+    } else {
+        
       Input <- RawData %>% filter(Idcode %in% ID_range) 
-    } 
+      
+    }  
     
     nPeople <- as.numeric(nrow(Input)) # number of people
     Pop.RESULTS <- list(
@@ -68,7 +69,7 @@
       OUT_Plots = vector("list", nPeople) # could be removed if it's too heavy for R
     )
     
-    } else { # Lifestage = "No" & Population = "No"
+    } else { # Population = "No"
     
     # Set exposure type, choose between "Oral", "Dermal", "Oral_Dermal" (if exposure is both Oral and Dermal), Inhalation"
     exposure_type = "Oral_Dermal"
@@ -77,8 +78,8 @@
     
     # Exposure-relevant information
     exposure_type = exposure_type # type of exposure
-    expCONC_Oral = 0 # ug/kg/day concentration to be used only when both oral and dermal are used
-    expCONC_Dermal = 0.03 # ug/kg/day concentration to be used only when both oral and dermal are used
+    expCONC_Oral = 0.001 # ug/kg/day concentration to be used only when both oral and dermal are used
+    expCONC_Dermal = 0.00 # ug/kg/day concentration to be used only when both oral and dermal are used
     expCONC = expCONC_Oral + expCONC_Dermal # ug/kg/day concentration
     Tinput = 1 # for repeated exposure or so default = 1
     tinterval = 1 # for repeated exposure or so default = 1
