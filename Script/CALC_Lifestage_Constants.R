@@ -27,6 +27,8 @@ TSTOP = 365*lifeTSTOP # years in days
 DT = 1
 TIME = seq(TSTART,TSTOP,by=DT)
 
+Q_M = 0.90 
+Q_F = 0.70
 
 # Creating a dataframe for all the variables
 Variables_df = as.data.frame(list(TIME = TIME)) # df column 1 = simulation time, every step is 1 day
@@ -321,23 +323,23 @@ Variables_df = Variables_df %>%
   mutate(GFR_F_flow = GFRc * (Q_kidneyFraction_F / QTotc * CardOut_F)) %>%
   
   # GFR (age-dependent) 
-  mutate(
-    Q_GFRi_M = if_else(age < 18, 0.1678 + ((0.90  - 0.1678) / 18) * age,
-                       0.90),
-    Q_GFRi_F = if_else(age < 18, 0.1678 + ((0.70  - 0.1678) / 18) * age,
-                       0.70)) %>%
+  mutate( # Currently child and adult SCr, can input exact/estimated Q for individuals
+    SCr_M = if_else(age < 18, 0.1678 + ((0.90  - 0.1678) / 18) * age,
+                       Q_M),
+    SCr_F = if_else(age < 18, 0.1678 + ((0.70  - 0.1678) / 18) * age,
+                       Q_F)) %>%
   # Baseline GFR for males and females
-  # (mL/min/1.73m^2 -> L/day)  # scale to actual BSA:SA_B*1e-4 / 1.73
+  # (ml/min/1.73m^2 -> L/day)  # scale to actual BSA:SA_B*1e-4 / 1.73
   mutate(
-    Q_GFR_M = (107.3 * 1.44 * (BSA_M) / 1.73) / (0.9/Q_GFRi_M),
-    Q_GFR_F = (107.3 * 1.44 * (BSA_F) / 1.73) / (0.7/Q_GFRi_F)
+    GFR_M_base = (107.3 * 1.44 * (BSA_M) / 1.73) / (Q_M / SCr_M), 
+    GFR_F_base = (107.3 * 1.44 * (BSA_F) / 1.73) / (Q_F / SCr_F)
   ) %>%
   # Exponential decline after age 40
   mutate(
-    GFR_M = if_else(age <= 40, Q_GFR_M,
-                       Q_GFR_M * 0.988^(age - 40)),
-    GFR_F = if_else(age <= 40, Q_GFR_F,
-                       Q_GFR_F * 0.988^(age - 40))
+    GFR_M = if_else(age <= 40, GFR_M_base,
+                       GFR_M_base * 0.988^(age - 40)),
+    GFR_F = if_else(age <= 40, GFR_F_base,
+                       GFR_F_base * 0.988^(age - 40))
   )
 
   write.csv(Variables_df, here("Input", "PhysioVariables.csv"), row.names = FALSE)
@@ -397,16 +399,21 @@ Variables_df = Variables_df %>%
 
 ## Plots ####
 
-ggplot() + 
-  geom_path(data = Variables_df, aes(age, GFR_M, colour = "Male")) +
-  geom_path(data = Variables_df, aes(age, GFR_F, colour = "Female")) +
-  scale_colour_manual(values = c("Male" = "orange",
-                                 "Female" = "brown"),
+p_GFR <- ggplot() + 
+  geom_path(data = Variables_df, aes(age, GFR_M/1.44, colour = "Male Age")) +
+  geom_path(data = Variables_df, aes(age, GFR_F/1.44, colour = "Female Age")) +
+  geom_path(data = Variables_df, aes(age, GFR_M_flow/1.44, colour = "Male Flow")) +
+  geom_path(data = Variables_df, aes(age, GFR_F_flow/1.44, colour = "Female Flow")) +
+  scale_colour_manual(values = c("Male Age" = "cornflowerblue",
+                                 "Female Age" = "darkorchid3",
+                                 "Male Flow" = "darkgreen",
+                                 "Female Flow" = "brown"),
                       name = "") +
-  theme_minimal()+
+  theme_minimal(base_size = 10)+
   ylab("GFR (ml/min)") +
   xlab("Age (years)")
   
+p_GFR  
 
 ## 
 ## 
