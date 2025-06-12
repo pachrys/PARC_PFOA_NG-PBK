@@ -307,7 +307,7 @@ p_PFOA_CPa
   # Correlation
   # corr_val <- cor(PFOA_OUT_df$GFR.x, PFOA_OUT_df$HalfLife.x, use = "complete.obs", method = "pearson")
   
-  p_PFOA_CPb <- ggplot(CP_long, aes(x = ageID, y = Concentration, color = Type)) +
+  p_PFOA_CP_sex <- ggplot(CP_long, aes(x = ageID, y = Concentration, color = Type)) +
     geom_point(aes(shape = Sex), size = 3, stroke = 1, fill = "white") +
     geom_smooth(aes(group = Type), method = "lm", linetype = "dashed", size = 1) +
     scale_y_log10() +
@@ -361,7 +361,7 @@ p_PFOA_CP_sex
   # # Correlation
   # corr_val <- cor(CP_wide$Measured, CP_wide$Predicted, use = "complete.obs", method = "pearson")
   
-  p_PFOA_CPc <- ggplot(CP_long, aes(x = ageID, y = Concentration, color = Type)) +
+  p_PFOA_CP_exp <- ggplot(CP_long, aes(x = ageID, y = Concentration, color = Type)) +
     geom_point(aes(shape = Exposure), size = 3, stroke = 1, fill = "white") +
     geom_smooth(aes(group = Type), method = "lm", linetype = "dashed", size = 1) +
     scale_y_log10() +
