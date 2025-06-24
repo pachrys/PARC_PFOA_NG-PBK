@@ -27,8 +27,8 @@ TSTOP = 365*lifeTSTOP # years in days
 DT = 1
 TIME = seq(TSTART,TSTOP,by=DT)
 
-Q_M = 0.90 
-Q_F = 0.70
+SCr_M = 0.90 # Default individual SCr values
+SCr_F = 0.70
 
 # Creating a dataframe for all the variables
 Variables_df = as.data.frame(list(TIME = TIME)) # df column 1 = simulation time, every step is 1 day
@@ -323,16 +323,16 @@ Variables_df = Variables_df %>%
   mutate(GFR_F_flow = GFRc * (Q_kidneyFraction_F / QTotc * CardOut_F)) %>%
   
   # GFR (age-dependent) 
-  mutate( # Currently child and adult SCr, can input exact/estimated Q for individuals
-    SCr_M = if_else(age < 18, 0.1678 + ((0.90  - 0.1678) / 18) * age,
-                       Q_M),
-    SCr_F = if_else(age < 18, 0.1678 + ((0.70  - 0.1678) / 18) * age,
-                       Q_F)) %>%
+  mutate( 
+    # Calculate default population SCrQ values for children and adults
+    SCrQ_M = if_else(age < 18, 0.1678 + ((0.90  - 0.1678) / 18) * age, SCr_M),
+    SCrQ_F = if_else(age < 18, 0.1678 + ((0.70  - 0.1678) / 18) * age, SCr_F)) %>%
+  
   # Baseline GFR for males and females
   # (ml/min/1.73m^2 -> L/day)  # scale to actual BSA:SA_B*1e-4 / 1.73
   mutate(
-    GFR_M_base = (107.3 * 1.44 * (BSA_M) / 1.73) / (Q_M / SCr_M), 
-    GFR_F_base = (107.3 * 1.44 * (BSA_F) / 1.73) / (Q_F / SCr_F)
+    GFR_M_base = (107.3 * 1.44 * (BSA_M) / 1.73) / (SCr_M / SCrQ_M), 
+    GFR_F_base = (107.3 * 1.44 * (BSA_F) / 1.73) / (SCr_F / SCrQ_F)
   ) %>%
   # Exponential decline after age 40
   mutate(

@@ -176,6 +176,10 @@ PFOA_OUT_df <- PFOA_OUT_df %>%
 
 # Data Analysis ####
 
+# check means
+colMeans(PFOA_OUT_df[sapply(PFOA_OUT_df, is.numeric)])
+
+
 ## Regression and Correlation ####
 
 # Flow-based model
