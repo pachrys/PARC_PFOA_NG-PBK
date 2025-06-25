@@ -322,17 +322,19 @@ Variables_df = Variables_df %>%
   mutate(GFR_M_flow = GFRc * (Q_kidneyFraction_M / QTotc * CardOut_M)) %>%
   mutate(GFR_F_flow = GFRc * (Q_kidneyFraction_F / QTotc * CardOut_F)) %>%
   
+  
   # GFR (age-dependent) 
   mutate( 
     # Calculate default population SCrQ values for children and adults
+    # Qi_M = 0.1678, Qi_F = 0.1305
     SCrQ_M = if_else(age < 18, 0.1678 + ((0.90  - 0.1678) / 18) * age, SCr_M),
-    SCrQ_F = if_else(age < 18, 0.1678 + ((0.70  - 0.1678) / 18) * age, SCr_F)) %>%
+    SCrQ_F = if_else(age < 18, 0.1305 + ((0.70  - 0.1305) / 18) * age, SCr_F)) %>%
   
   # Baseline GFR for males and females
   # (ml/min/1.73m^2 -> L/day)  # scale to actual BSA:SA_B*1e-4 / 1.73
   mutate(
-    GFR_M_base = (107.3 * 1.44 * (BSA_M) / 1.73) / (SCr_M / SCrQ_M), 
-    GFR_F_base = (107.3 * 1.44 * (BSA_F) / 1.73) / (SCr_F / SCrQ_F)
+    GFR_M_base = (107.3 * 1.44 * (BSA_M)/1.73) / (SCr_M/SCrQ_M), 
+    GFR_F_base = (107.3 * 1.44 * (BSA_F)/1.73) / (SCr_F/SCrQ_F)
   ) %>%
   # Exponential decline after age 40
   mutate(
