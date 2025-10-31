@@ -66,15 +66,12 @@
       warning("Removing ", sum(is.na(Input$expAGE)), 
               " samples as they had NA(s) as expAGE; exposure AGE is needed to run the lifestage model")
       Input <- filter (Input, !is.na(expAGE))
-      # Input <- INPUT_dummy %>% filter(Study == "EffectOfLifestageEq") # Choose the study you're interested in
     } 
     
-    nPeople <- as.numeric(nrow(Input)) # number of people
+    nPeople <- as.numeric(nrow(Input)) 
     Pop.RESULTS <- list(
-      CALC_Parameters = vector("list", nPeople), # list of length nPeople
-      PBK_OUTPUT = vector("list", nPeople) #,
-      # ANALYSED_data = vector("list", nPeople),
-      # OUT_Plots = vector("list", nPeople) # could be removed if it's too heavy for R
+      CALC_Parameters = vector("list", nPeople), 
+      PBK_OUTPUT = vector("list", nPeople) 
     )
     
     
@@ -88,29 +85,27 @@
     # Exposure-relevant information
     # Current input is that of the Abraham study; Abraham et al. 2024 https://doi.org/10.1016/j.envint.2024.109047 
     exposure_type = exposure_type # type of exposure
-    exp_Oral = 0.00019 #0.00004236 #0.0418 # ug/kg/day, (for Abraham: 3.96/BW of 82Kg),to be used only when both oral and dermal are used
+    exp_Oral = 0.00019 # ug/kg/day, to be used only when both oral and dermal are used
     exp_Dermal = 0 # ug/kg/day, to be used only when both oral and dermal are used
     exp = exp_Oral + exp_Dermal # ug/kg/day 
     Tinput = 1 # for repeated exposure or so default = 1
     tinterval = 1 # for repeated exposure or so default = 1
-    expSTOP = 30*365 #7300 #50*365 # time in days after which the exposure stopped
+    expSTOP = 30*365 # time in days after which the exposure stopped
     
     # Subject-relevant information
-    expAGE = 20 #65  # years, old age at exposure if not provided then age argument is not used physiology is based on BW
-    expBW = NA # 82 # kg, if not provided then the BW of the corresponding age and sex is taken; if both BW and Age are not given then a default BW = 70 is taken; if BW is higher than the BW from the lifestage equations then the actual BW overwrites the calculated one
+    expAGE = 20 # years, old age at exposure if not provided then age argument is not used physiology is based on BW
+    expBW = NA # kg, if not provided then the BW of the corresponding age and sex is taken; if both BW and Age are not given then a default BW = 70 is taken; if BW is higher than the BW from the lifestage equations then the actual BW overwrites the calculated one
     sex = "M" # sex either "F" or "M" if none then default is "M"
     
     # Simulation relevant information
     Tstart = 0 # days, start of the simulation
     Tstop = 30*365 # days, stop of the simulation
-    Dt = 1/10 #1/10000 # days, iteration steps (decrease/increase depending on run time)
+    Dt = 1/1000 # days, iteration steps (decrease/increase depending on run time)
     
     
     RawData <- list(
       CALC_Parameters = vector("list", 1), 
-      PBK_OUTPUT = vector("list", 1) #,
-      # ANALYSED_data = vector("list", 1),
-      # OUT_Plots = vector("list", 1) 
+      PBK_OUTPUT = vector("list", 1) 
     )
     
     if(Lifestage == "Yes"){
@@ -165,13 +160,9 @@
           
         )
         
-        # Collect population results together
+        # Collect population results 
         Pop.RESULTS$CALC_Parameters[[i]] <- Pop.MODEL_OUTPUT$CALC_Parameters
         Pop.RESULTS$PBK_OUTPUT[[i]] <- Pop.MODEL_OUTPUT$PBK_OUTPUT
-        # Pop.RESULTS$ANALYSED_data[[i]] <- Pop.MODEL_OUTPUT$ANALYSED_data
-        # Pop.RESULTS$OUT_Plots[[i]] <- Pop.MODEL_OUTPUT$OUT_Plots # could be removed if it's too heavy for R
-        # 
-        
         
       }
       
@@ -214,9 +205,6 @@
         
         Pop.RESULTS$CALC_Parameters[[i]] = Pop.MODEL_OUTPUT$CALC_Parameters
         Pop.RESULTS$PBK_OUTPUT[[i]] = Pop.MODEL_OUTPUT$PBK_OUTPUT
-        # Pop.RESULTS$ANALYSED_data[[i]] = Pop.MODEL_OUTPUT$ANALYSED_data
-        # Pop.RESULTS$OUT_Plots[[i]] = Pop.MODEL_OUTPUT$OUT_Plots # could be removed if it's too heavy for R
-        
       }
       
     }
@@ -357,21 +345,13 @@
 
   
   # Create Report ----
-  # quarto_render(input = (here("PBK_Results_Report.qmd")),
-  #               output_format = "pdf",
-  #               # output_file = (here(OUTPUT, "PBK_Results_Report.html")),
-  #               execute_params = list(Lifestage = Lifestage,
-  #                                     Population = Population,
-  #                                     Test_study = Test_study)
-  # )
-  # 
-  # quarto_render(input = (here("PBK_Results_Report.qmd")),
-  #               output_format = "html",
-  #               # output_file = (here(OUTPUT, "PBK_Results_Report.html")),
-  #               execute_params = list(Lifestage = Lifestage,
-  #                                     Population = Population,
-  #                                     Test_study = Test_study)
-  # )
-  # browseURL(here("PBK_Results_Report.html"))
-  # 
-  # 
+  quarto_render(input = (here("PBK_Results_Report.qmd")),
+                output_format = "html",
+                # output_file = (here(OUTPUT, "PBK_Results_Report.html")),
+                execute_params = list(Lifestage = Lifestage,
+                                      Population = Population,
+                                      Test_study = Test_study)
+  )
+  browseURL(here("PBK_Results_Report.html"))
+
+

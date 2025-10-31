@@ -5,7 +5,7 @@
 # Date: 14-04-2025
 # --------------------------------------------------------------------------- #
 
-rm(list=ls()) # to clear out the global environment
+rm(list=ls()) 
 
 # Packages
 library(here)
@@ -345,12 +345,6 @@ Variables_df <- Variables_df %>%
     GFR_F = if_else(age <= 40, GFR_F_base,
                     GFR_F_base * 0.988^(age - 40))
   ) %>% 
-  # mutate(
-  #   GFR_M = Q_GFRc_M*0.6944444444*1.73,
-  #   GFR_F = Q_GFRc_F*0.6944444444*1.73
-  # )
-  # Serum Albumin per age: (g_HSA /L_serum, or mg/ml);
-  # Derived from Weaving et al 2016; DOI: 10.1177/0004563215593561, Figure 1
   mutate( 
     SAlb_M = 3.9330e+01 + (5.8156e-01*age) - (1.9072e-02*(age^2)) +
       (2.3220e-04*(age^3)) - (1.0313e-06*(age^4)), 
@@ -463,10 +457,6 @@ Flows %>%
   CP_theme +
   ylab("Blood flow (L/d)") +
   xlab("Age (years)")
-  # theme(axis.title = element_text(size = 15),
-  #       axis.text = element_text(size = 14),
-  #       legend.position = "bottom",
-  #       legend.text = element_text(size = 14))
 ggsave(filename = here("OrganFlows.png"),
        dpi = 600,
        width = 10,
@@ -544,10 +534,6 @@ ggplot() +
   CP_theme+
   ylab("QC (L/d)") +
   xlab("Age (years)")
-  # theme(axis.title = element_text(size = 15),
-  #       axis.text = element_text(size = 14),
-  #       legend.position = "bottom",
-  #       legend.text = element_text(size = 14))
 ggsave(filename = here("QC.png"),
        dpi = 600,
        width = 10,
@@ -586,15 +572,11 @@ Volumes %>%
   CP_theme +
   ylab("Weight (Kg)") +
   xlab("Age (years)")
-  # theme(axis.title = element_text(size = 15),
-  #       axis.text = element_text(size = 14),
-  #       legend.position = "bottom",
-  #       legend.text = element_text(size = 14))
 ggsave(filename = here("OrganVolumes.png"),
        dpi = 600,
        width = 10,
        height = 8,
        units = "cm")
-# 
+#
 # CalcPhysioParams <- cbind(Flows, Volumes)
 # write.csv(CalcPhysioParams, here("Input", "CalculatedPhysiologicalParams.csv"), row.names = FALSE)

@@ -33,43 +33,7 @@ BASE_PARAMS <- function(expAGE = NULL, expBW = NULL, sex = NULL) {
     CL_menses <- 0 # L/day
   }
   
-  # # Serum albumin (g_HSA /L_serum, or mg/ml); Weaving et al 2016; DOI: 10.1177/0004563215593561
-  # if (expAGE <= 5) {
-  #   SAlb <- 43  
-  # } else if (expAGE <= 15 && sex == "M") {
-  #   SAlb <- 44
-  # } else if (expAGE <= 25 && sex == "M") {
-  #   SAlb <- 46
-  # } else if (expAGE <= 35 && sex == "M") {  
-  #   SAlb <- 45
-  # } else if (expAGE <= 50 && sex == "M") {
-  #   SAlb <- 44
-  # } else if (expAGE <= 60 && sex == "M") {
-  #   SAlb <- 43
-  # } else if (expAGE <= 75 && sex == "M") {
-  #   SAlb <- 42
-  # } else if (expAGE <= 80 && sex == "M") {
-  #   SAlb <- 41
-  # } else if (expAGE <= 90 && sex == "M") {
-  #   SAlb <- 40
-  # } else if (expAGE <= 10 && sex == "F") {
-  #   SAlb <- 45
-  # } else if (expAGE <= 20 && sex == "F") {
-  #   SAlb <- 44
-  # } else if (expAGE <= 40 && sex == "F") {
-  #   SAlb <- 43
-  # } else if (expAGE <= 75 && sex == "F") {
-  #   SAlb <- 42
-  # } else if (expAGE <= 85 && sex == "F") {
-  #   SAlb <- 41
-  # } else if (expAGE <= 90 && sex == "F") {
-  #   SAlb <- 40
-  # } else if (expAGE <= 94) { 
-  #   SAlb <- 39
-  # } else { 
-  #   SAlb <- 38
-  # } 
-  # 
+ 
   ## Input
   Physio_params <- Physio.c
   
@@ -111,6 +75,7 @@ BASE_PARAMS <- function(expAGE = NULL, expBW = NULL, sex = NULL) {
   GFR <- Physio_params[[paste0("GFR", suffix)]]                 # Age/creatinine dependent glomerular filtration rate (L/day)
   
   SAlb <- Physio_params[[paste0("SAlb", suffix)]]               # Serum albumin concentration (g_HSA /L_serum, or mg/ml)
+  
   ### Organ volumes -------------------------
   
   

@@ -6,7 +6,7 @@
 # --------------------------------------------------------------------------- #
 
 
-rm(list=ls()) # to clear out the global environment
+rm(list=ls()) 
 
 # Packages
 library(here)
