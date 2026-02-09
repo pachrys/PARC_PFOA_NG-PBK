@@ -142,11 +142,11 @@ model *PBK_PFOA()
   // Parameters and their Assignment Rules and Variable initializations:
   var BW;
       BW has L;
-      BW := 80.126;
+      BW := 82;
 
   var QC;
       QC has L_PER_DAY;
-      QC := 5388.262;
+      QC := 4919.541;
   
   var HCT;
       HCT has UNITLESS;
@@ -353,7 +353,7 @@ model *PBK_PFOA()
         PRest has UNITLESS;
 
   var kabs;
-      kabs := 0.694;
+      kabs := 56.94593;
       kabs has L_PER_DAY;
 
   var VmaxOATP2B1;
@@ -361,7 +361,7 @@ model *PBK_PFOA()
       VmaxOATP2B1 has MicroGM_PER_DAY;
 
       var VmaxOATP2B1c;
-          VmaxOATP2B1c := 228035946;
+          VmaxOATP2B1c := 228035978;
           VmaxOATP2B1c has microg_per_day_per_L;
 
   var Km_OATP2B1;
@@ -397,7 +397,7 @@ model *PBK_PFOA()
       Vmax_OAT4 has MicroGM_PER_DAY;
 
       const Vmax_OAT4c;
-            Vmax_OAT4c = 13756588116;
+            Vmax_OAT4c = 13756588457;
             Vmax_OAT4c has microg_per_day_per_L;
  
   var Km_OAT4;
@@ -421,7 +421,7 @@ model *PBK_PFOA()
       CL_menses has L_per_day;
 
   var GFR;
-      GFR := 182.5913;
+      GFR := 144.3823;
       GFR has L_PER_DAY;
 
   var QUrine;
@@ -433,11 +433,11 @@ model *PBK_PFOA()
       QTubule has L_per_day;
 
   var SAlb; 
-      SAlb := 45.15337;
+      SAlb := 41.73563;
       SAlb has UNITLESS;
 
   var fup;
-      fup := 1/(1 + 41071.34*(SAlb*0.001/(1 - SAlb*10^-3 - 0.031)) + 173.4528*(0.031/(1 - SAlb*0.001 - 0.031)));
+      fup := 1/(1 + (29076.28*(SAlb*0.001/(1 - (SAlb*0.001) - 0.031))) + (173.4528*(0.031/(1 - (SAlb*0.001) - 0.031))));
       fup has UNITLESS;
 
   var R_L_ec;
