@@ -12,7 +12,7 @@ scenarios:
   - id: oral_single
     label: Oral single dose
     duration: 426
-    evaluation_resolution: 24
+    evaluation_resolution: 240
     time_unit: DAY
     amount_unit: MICROGRAMS
     initial_states:
@@ -21,7 +21,7 @@ scenarios:
     dosing_events:
       - type: single_bolus
         target: AOral
-        amount: 0.04829268
+        amount: 3.96 
         time: 1
     outputs:
       - id: AIntestine_lumen
