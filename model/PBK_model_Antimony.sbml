@@ -698,7 +698,7 @@
           </rdf:RDF>
         </annotation>
       </parameter>
-      <parameter metaid="PBK_PFOA.BW" id="BW" name="bodyweight" value="80.126" units="L" constant="false">
+      <parameter metaid="PBK_PFOA.BW" id="BW" name="bodyweight" value="82" units="L" constant="false">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#PBK_PFOA.BW">
@@ -711,7 +711,7 @@
           </rdf:RDF>
         </annotation>
       </parameter>
-      <parameter metaid="PBK_PFOA.QC" id="QC" name="Plasma cardiac output" value="5388.262" units="L_PER_DAY" constant="false">
+      <parameter metaid="PBK_PFOA.QC" id="QC" name="Plasma cardiac output" value="4919.541" units="L_PER_DAY" constant="false">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#PBK_PFOA.QC">
@@ -1209,7 +1209,7 @@
           </rdf:RDF>
         </annotation>
       </parameter>
-      <parameter metaid="PBK_PFOA.kabs" id="kabs" name="Intestinal absorption" value="0.694" units="L_PER_DAY" constant="false">
+      <parameter metaid="PBK_PFOA.kabs" id="kabs" name="Intestinal absorption" value="56.94593" units="L_PER_DAY" constant="false">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#PBK_PFOA.kabs">
@@ -1245,7 +1245,7 @@
           </rdf:RDF>
         </annotation>
       </parameter>
-      <parameter metaid="PBK_PFOA.VmaxOATP2B1c" id="VmaxOATP2B1c" name="Limiting rate of OAT P2B1 relativized by intestinal lumen volume" value="228035946" units="microg_per_day_per_L" constant="false">
+      <parameter metaid="PBK_PFOA.VmaxOATP2B1c" id="VmaxOATP2B1c" name="Limiting rate of OAT P2B1 relativized by intestinal lumen volume" value="228035978" units="microg_per_day_per_L" constant="false">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#PBK_PFOA.VmaxOATP2B1c">
@@ -1407,7 +1407,7 @@
           </rdf:RDF>
         </annotation>
       </parameter>
-      <parameter metaid="PBK_PFOA.Vmax_OAT4c" id="Vmax_OAT4c" name="Limiting rate of OAT4 relativized by kidney proximal tubule" value="13756588116" units="microg_per_day_per_L" constant="true">
+      <parameter metaid="PBK_PFOA.Vmax_OAT4c" id="Vmax_OAT4c" name="Limiting rate of OAT4 relativized by kidney proximal tubule" value="13756588457" units="microg_per_day_per_L" constant="true">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#PBK_PFOA.Vmax_OAT4c">
@@ -1498,7 +1498,7 @@
         </annotation>
       </parameter>
       <parameter id="CL_menses" name="Plasma menstrual loss" value="0" units="L_PER_DAY" constant="false"/>
-      <parameter metaid="PBK_PFOA.GFR" id="GFR" name="glomerular filtration rate" value="182.5913" units="L_PER_DAY" constant="false">
+      <parameter metaid="PBK_PFOA.GFR" id="GFR" name="glomerular filtration rate" value="144.3823" units="L_PER_DAY" constant="false">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
             <rdf:Description rdf:about="#PBK_PFOA.GFR">
@@ -1513,7 +1513,7 @@
       </parameter>
       <parameter id="QUrine" name="Urine secretion flow" units="L_PER_DAY" constant="false"/>
       <parameter id="QTubule" name="proximaltubule fluid flow" units="L_PER_DAY" constant="false"/>
-      <parameter id="SAlb" name="serum albumine concentration" value="45.15337" units="UNITLESS" constant="false"/>
+      <parameter id="SAlb" name="serum albumine concentration" value="41.73563" units="UNITLESS" constant="false"/>
       <parameter metaid="PBK_PFOA.fup" id="fup" name="fraction unbound in plasma" units="UNITLESS" constant="false">
         <annotation>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:vCard4="http://www.w3.org/2006/vcard/ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
@@ -1808,12 +1808,12 @@
       </assignmentRule>
       <assignmentRule variable="BW">
         <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <cn> 80.126 </cn>
+          <cn type="integer"> 82 </cn>
         </math>
       </assignmentRule>
       <assignmentRule variable="QC">
         <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <cn> 5388.262 </cn>
+          <cn> 4919.541 </cn>
         </math>
       </assignmentRule>
       <assignmentRule variable="HCT">
@@ -2148,7 +2148,7 @@
       </assignmentRule>
       <assignmentRule variable="kabs">
         <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <cn> 0.694 </cn>
+          <cn> 56.94593 </cn>
         </math>
       </assignmentRule>
       <assignmentRule variable="VmaxOATP2B1">
@@ -2162,7 +2162,7 @@
       </assignmentRule>
       <assignmentRule variable="VmaxOATP2B1c">
         <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <cn type="integer"> 228035946 </cn>
+          <cn type="integer"> 228035978 </cn>
         </math>
       </assignmentRule>
       <assignmentRule variable="Km_OATP2B1">
@@ -2228,7 +2228,7 @@
       </assignmentRule>
       <assignmentRule variable="GFR">
         <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <cn> 182.5913 </cn>
+          <cn> 144.3823 </cn>
         </math>
       </assignmentRule>
       <assignmentRule variable="QUrine">
@@ -2251,7 +2251,7 @@
       </assignmentRule>
       <assignmentRule variable="SAlb">
         <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <cn> 45.15337 </cn>
+          <cn> 41.73563 </cn>
         </math>
       </assignmentRule>
       <assignmentRule variable="fup">
@@ -2264,7 +2264,7 @@
               <cn type="integer"> 1 </cn>
               <apply>
                 <times/>
-                <cn> 41071.34 </cn>
+                <cn> 29076.28 </cn>
                 <apply>
                   <divide/>
                   <apply>
@@ -2280,11 +2280,7 @@
                       <apply>
                         <times/>
                         <ci> SAlb </ci>
-                        <apply>
-                          <power/>
-                          <cn type="integer"> 10 </cn>
-                          <cn type="integer"> -3 </cn>
-                        </apply>
+                        <cn> 0.001 </cn>
                       </apply>
                     </apply>
                     <cn> 0.031 </cn>

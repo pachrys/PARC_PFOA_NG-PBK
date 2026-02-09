@@ -11,17 +11,17 @@ model_instances:
 scenarios:
   - id: oral_single
     label: Oral single dose
-    duration: 4
+    duration: 426
     evaluation_resolution: 24
     time_unit: DAY
     amount_unit: MICROGRAMS
     initial_states:
       - target: APlasma
-        amount: 100
+        amount: 0
     dosing_events:
       - type: single_bolus
         target: AOral
-        amount: 1
+        amount: 0.04829268
         time: 1
     outputs:
       - id: AIntestine_lumen
@@ -63,7 +63,7 @@ scenarios:
     dosing_events:
       - type: repeated_bolus
         target: AOral
-        amount: 100
+        amount: 0
         time: 0
         interval: 1
     outputs:
