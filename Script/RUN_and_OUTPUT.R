@@ -441,6 +441,7 @@ POST.Run <- function(exposure_type,
   
   
   # Plot organ concentrations
+  
   Plot_C_organs <- C_organs.df %>% 
     ggplot(aes(time, Concentration)) +
     geom_path(linewidth = 0.5) +
@@ -453,12 +454,19 @@ POST.Run <- function(exposure_type,
   
   ## Calculate AUC and Half life ####
   AUC <- trapz(PBK_OUTPUT[ , "time"], PBK_OUTPUT[ , "CP"])  # ug*day/L
-  print(AUC)
+  AUC <- round(AUC, 3)
+  message(glue("AUC {AUC} ug*day/L"))
   
   time <- PBK_OUTPUT[ , "time"] # days
   conc <- PBK_OUTPUT[ , "CP"] # ug/L or ng/ml
   Cmax <- max(conc)
+  Cmax <- round(Cmax, 3)
+  message(glue("Cmax {Cmax} ug/L"))
+  
   Tmax <- time[which.max(conc)]
+  Tmax <- round(Tmax/365, 3)
+  message(glue("Tmax {Tmax} years"))
+  
   tlast <- max(time[conc > 0])
   half_life <- pk.calc.half.life(
     conc,
@@ -466,8 +474,11 @@ POST.Run <- function(exposure_type,
     Tmax,
     tlast
   )
+  
   HalfLife <- half_life$half.life/365  # half-life in years
-  print(HalfLife)
+  HalfLife <- round(HalfLife,3)
+  message(glue("Half-life {HalfLife} years"))
+  
   
   # Evaluate against HBM data ####
   HL_literature <- Lit.HalfLifes %>%
@@ -556,13 +567,37 @@ Pers.POST.Run <- function(exposure_type,
   MB_plot
   
   ## Plot organ concentrations ####
+  
+  # For liver and kidney
+  BW <- RawData$CALC_Parameters$BW
+  VKc <- RawData$CALC_Parameters$VKc
+  VK <- VKc * BW                    # L, Volume of kidney
+  VPTc <- RawData$CALC_Parameters$VPTc
+  VPT <- VPTc * VK                  # L, Volume of proximal tubule
+  VPTTc <- RawData$CALC_Parameters$VPTTc 
+  VPTT <- VPT * VPTTc              # L, Volume of proximal tubule tissue
+  VPTLc <- RawData$CALC_Parameters$VPTLc  
+  VPTL <- VPT * VPTLc
+  VRKLc <- RawData$CALC_Parameters$VRKLc  
+  VRKL <- (VK - VPT) *  VRKLc    # L, Volume of rest of kidney lumen
+  cVRKL <- VK/VRKL
+  VRKT <- VK - VPTT - VPTL - VRKL # L, Volume of rest of kidney tissue, used in the model
+  VRKTc <- VK/VRKT
+  
+  VLc <- RawData$CALC_Parameters$VLc
+  VL <- VLc * BW
+  VL_icc <- RawData$CALC_Parameters$VL_icc 
+  VL_ic <- VL_icc * VL              # L, Volume liver intracellular                 
+  VL_ecc <- RawData$CALC_Parameters$VL_ecc
+  VL_ec <- VL_ecc * VL              # L, Volume liver extracellular 
+  
   C_organs.df <- switch (exposure_type,
                          "Oral" = PBK_OUTPUT %>% 
                            transmute(
                              time = time,
                              CI = CI,
-                             CK = (((CPTT*VPTT) + (CRKT*VRKT) + (CPTL*VPTL) + (CRKL*VRKL))/(VPTT + VRKT + VPTL + VRKL)), 
-                             CL = (((CL_ic*VL_ic) + (CL_ec*VL_ec))/(VL_ic + VL_ec)),
+                             CK = CPTT, #(((CPTT*VPTT) + (CRKT*VRKT) + (CPTL*VPTL) + (CRKL*VRKL))/(VPTT + VRKT + VPTL + VRKL)), 
+                             CL = CL_ic, #(((CL_ic*VL_ic) + (CL_ec*VL_ec))/(VL_ic + VL_ec)),
                              CA, CR, CP  
                            ) %>% 
                            rename("Intestine" = CI, 
@@ -576,8 +611,8 @@ Pers.POST.Run <- function(exposure_type,
                            transmute(
                              time = time,
                              CI = CI,
-                             CK = (((CPTT*VPTT) + (CRKT*VRKT) + (CPTL*VPTL) + (CRKL*VRKL))/(VPTT + VRKT + VPTL + VRKL)), 
-                             CL = (((CL_ic*VL_ic) + (CL_ec*VL_ec))/(VL_ic + VL_ec)),
+                             CK = CPTT, #(((CPTT*VPTT) + (CRKT*VRKT) + (CPTL*VPTL) + (CRKL*VRKL))/(VPTT + VRKT + VPTL + VRKL)), 
+                             CL = CL_ic, #(((CL_ic*VL_ic) + (CL_ec*VL_ec))/(VL_ic + VL_ec)),
                              CSk, CA, CR, CP  
                            ) %>% 
                            rename("Intestine" = CI, 
@@ -592,8 +627,8 @@ Pers.POST.Run <- function(exposure_type,
                            transmute(
                              time = time,
                              CI = CI,
-                             CK = (((CPTT*VPTT) + (CRKT*VRKT) + (CPTL*VPTL) + (CRKL*VRKL))/(VPTT + VRKT + VPTL + VRKL)), 
-                             CL = (((CL_ic*VL_ic) + (CL_ec*VL_ec))/(VL_ic + VL_ec)),
+                             CK = CPTT, #(((CPTT*VPTT) + (CRKT*VRKT) + (CPTL*VPTL) + (CRKL*VRKL))/(VPTT + VRKT + VPTL + VRKL)), 
+                             CL = CL_ic, #(((CL_ic*VL_ic) + (CL_ec*VL_ec))/(VL_ic + VL_ec)),
                              CSk, CA, CR, CP  
                            ) %>% 
                            rename("Intestine" = CI, 
@@ -608,8 +643,8 @@ Pers.POST.Run <- function(exposure_type,
                            transmute(
                              time = time,
                              CI = CI,
-                             CK = (((CPTT*VPTT) + (CRKT*VRKT) + (CPTL*VPTL) + (CRKL*VRKL))/(VPTT + VRKT + VPTL + VRKL)), 
-                             CL = (((CL_ic*VL_ic) + (CL_ec*VL_ec))/(VL_ic + VL_ec)),
+                             CK = CPTT, #(((CPTT*VPTT) + (CRKT*VRKT) + (CPTL*VPTL) + (CRKL*VRKL))/(VPTT + VRKT + VPTL + VRKL)), 
+                             CL = CL_ic, #(((CL_ic*VL_ic) + (CL_ec*VL_ec))/(VL_ic + VL_ec)),
                              CLu, CA, CR, CP  
                            ) %>% 
                            rename("Intestine" = CI, 

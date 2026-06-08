@@ -72,23 +72,33 @@ ORAL_PBK_RUN <- function(y, parms, times){ # Input for ode
       
       # Gastro-intestinal uptake
       CL_IL <- (Papp_SI*SA_SI*1e-3)*60*60*24    # L/d, Intestinal lumen to intestinal tissue (calculations: cm/s -> L/s /1000 -> L/d *60*60*24)
+      message(glue("Abs {CL_IL}"))
+      
       
       VmaxOATP2B1 <- Vmax_OATP2B1c*MW*60*24*SF_OATP2B1*VIL # ug/d
       Km_OATP2B1 <- Km_OATP2B1c*MW                         # ug/L (uM -> ug/L)
+      message(glue("OATP2B1 {VmaxOATP2B1/Km_OATP2B1}"))
       
       # Liver uptake
       Vmax_OATP1B1 <- Vmax_OATP1B1c*MW*60*24*SF_OATP1B1*VL_ec             # ug/d
       Km_OATP1B1 <- Km_OATP1B1c*MW                                        # ug/L (uM -> ug/L)
+      message(glue("OATP1B1 {Vmax_OATP1B1/Km_OATP1B1}"))
+      
+      
       Vmax_OATP1B3 <- Vmax_OATP1B3c*MW*60*24*SF_OATP1B3*VL_ec             # ug/d
       Km_OATP1B3 <- Km_OATP1B3c*MW                                        # ug/L (uM -> ug/L)
+      message(glue("OATP1B3 {Vmax_OATP1B3/Km_OATP1B3}"))
+      
       
       # Biliary excretion
       Vmax_BSEP <- Vmax_BSEPc*MW*60*24*SF_BSEP*VL_ic         # ug/d
       Km_BSEP <- Km_BSEPc*MW                                 # ug/L (uM -> ug/L)
+      message(glue("BSEP {Vmax_BSEP/Km_BSEP}"))
       
       # Renal clearance
       Vmax_OAT4 = Vmax_OAT4c*MW*60*24*SF_OAT*VPT           # ug/d (umol -> ug, min -> d)
       Km_OAT4 = Km_OAT4c*MW                                # ug/L (uM -> ug/L)
+      message(glue("OAT4 {Vmax_OAT4/Km_OAT4}"))
       
       # Clearance via menstruation
       CL_menses = CL_menses     # L/d, plasma menstrual loss

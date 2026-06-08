@@ -180,7 +180,6 @@ if (params$Population == "Yes") {
 }
 ```
 
-
 ```{r}
 #| label: Goodness of fit
 #| echo: false
